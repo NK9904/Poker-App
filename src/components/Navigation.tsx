@@ -8,10 +8,10 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { path: '/', label: 'Home', icon: '🏠' },
-  { path: '/solver', label: 'Poker Solver', icon: '🧠' },
-  { path: '/analyzer', label: 'Hand Analyzer', icon: '🔍' },
-  { path: '/ranges', label: 'Range Calculator', icon: '📊' }
+  { path: '/', label: 'Live Poker', icon: '♠️' },
+  { path: '/solver', label: 'AI Solver', icon: '🤖' },
+  { path: '/analyzer', label: 'Hand Analysis', icon: '📊' },
+  { path: '/ranges', label: 'Range Builder', icon: '🎯' }
 ]
 
 export const Navigation = memo(() => {
@@ -39,14 +39,17 @@ export const Navigation = memo(() => {
           style={{
             fontSize: '1.5rem',
             fontWeight: '700',
-            color: 'var(--color-accent)',
+            background: 'var(--gradient-primary)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
             textDecoration: 'none',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
           }}
         >
-          ♠️ Poker AI
+          🃏 PokerPro AI
         </Link>
         
         <ul style={{

@@ -1,156 +1,248 @@
-import React, { memo } from 'react'
+import React, { memo, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { AIModel3D } from '../components/AIModel3D'
+import { PokerTable } from '../components/PokerTable'
 
 const HomePage = memo(() => {
+  const [aiDecision, setAiDecision] = useState<string>('')
+  const [aiConfidence, setAiConfidence] = useState<number>(0)
+  const [isThinking, setIsThinking] = useState<boolean>(false)
+  const [gameState] = useState({
+    players: [
+      {
+        id: 'player1',
+        name: 'You',
+        chips: 2500,
+        cards: [
+          { suit: 'hearts' as const, rank: 'A', value: 14 },
+          { suit: 'spades' as const, rank: 'K', value: 13 }
+        ],
+        position: 'bottom' as const,
+        isActive: true,
+        isDealer: false,
+        bet: 0
+      },
+      {
+        id: 'player2',
+        name: 'AI Opponent',
+        chips: 1800,
+        cards: [
+          { suit: 'diamonds' as const, rank: 'Q', value: 12 },
+          { suit: 'clubs' as const, rank: 'J', value: 11 }
+        ],
+        position: 'top' as const,
+        isActive: true,
+        isDealer: true,
+        bet: 50
+      }
+    ],
+    communityCards: [
+      { suit: 'hearts' as const, rank: '10', value: 10 },
+      { suit: 'diamonds' as const, rank: '9', value: 9 },
+      { suit: 'spades' as const, rank: '8', value: 8 }
+    ],
+    pot: 150,
+    currentPlayer: 'player1'
+  })
+
+  const simulateAIThinking = () => {
+    setIsThinking(true)
+    setTimeout(() => {
+      const decisions = ['Raise', 'Call', 'Fold']
+      const decision = decisions[Math.floor(Math.random() * decisions.length)]
+      const confidence = Math.random() * 0.4 + 0.6 // 60-100%
+      
+      setAiDecision(decision)
+      setAiConfidence(confidence)
+      setIsThinking(false)
+    }, 2000)
+  }
+
+  useEffect(() => {
+    const interval = setInterval(simulateAIThinking, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const handleAction = (action: 'fold' | 'call' | 'raise', amount?: number) => {
+    console.log(`Player action: ${action}${amount ? ` $${amount}` : ''}`)
+    // Here you would integrate with your poker logic
+  }
+
   return (
-    <div className="home-page" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+    <div className="live-poker-page" style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+      {/* Header */}
+      <motion.div 
+        style={{ textAlign: 'center', marginBottom: '2rem' }}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
         <h1 style={{ 
-          fontSize: '3rem', 
+          fontSize: '2.5rem', 
           fontWeight: '700', 
           marginBottom: '1rem',
-          background: 'linear-gradient(135deg, var(--color-accent), #8b5cf6)',
+          background: 'var(--gradient-primary)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text'
         }}>
-          Poker AI Solver
+          Live Poker Table
         </h1>
         <p style={{ 
-          fontSize: '1.25rem', 
+          fontSize: '1.125rem', 
           color: 'var(--color-text-secondary)', 
           maxWidth: '600px', 
           margin: '0 auto' 
         }}>
-          Advanced AI-powered poker analysis with optimized performance for lightning-fast calculations.
+          Experience real-time poker with AI-powered decision making
         </p>
-      </div>
+      </motion.div>
 
+      {/* Main Game Area */}
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+        gridTemplateColumns: '1fr 400px', 
         gap: '2rem',
-        marginBottom: '3rem'
+        marginBottom: '2rem'
       }}>
-        <FeatureCard
-          icon="🧠"
-          title="Poker Solver"
-          description="Advanced GTO solver for optimal play decisions"
-          link="/solver"
-          performance="< 100ms calculations"
-        />
-        <FeatureCard
-          icon="🔍"
-          title="Hand Analyzer"
-          description="Detailed hand analysis with equity calculations"
-          link="/analyzer"
-          performance="Real-time analysis"
-        />
-        <FeatureCard
-          icon="📊"
-          title="Range Calculator"
-          description="Pre-flop and post-flop range construction tools"
-          link="/ranges"
-          performance="Instant range updates"
-        />
+        {/* Poker Table */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <PokerTable 
+            players={gameState.players}
+            communityCards={gameState.communityCards}
+            pot={gameState.pot}
+            currentPlayer={gameState.currentPlayer}
+            onAction={handleAction}
+          />
+        </motion.div>
+
+        {/* AI Model Panel */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <div className="card" style={{ marginBottom: '1rem' }}>
+            <h3 style={{ 
+              marginBottom: '1rem', 
+              color: 'var(--color-accent)',
+              fontSize: '1.25rem',
+              fontWeight: '600'
+            }}>
+              AI Decision Engine
+            </h3>
+            <AIModel3D 
+              decision={aiDecision}
+              confidence={aiConfidence}
+              isThinking={isThinking}
+            />
+          </div>
+
+          {/* Game Stats */}
+          <div className="card">
+            <h3 style={{ 
+              marginBottom: '1rem', 
+              color: 'var(--color-accent)',
+              fontSize: '1.25rem',
+              fontWeight: '600'
+            }}>
+              Game Statistics
+            </h3>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: '1fr 1fr', 
+              gap: '1rem'
+            }}>
+              <div className="stat-card">
+                <div className="stat-value">$2,500</div>
+                <div className="stat-label">Your Stack</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">$1,800</div>
+                <div className="stat-label">Opponent Stack</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">$150</div>
+                <div className="stat-label">Current Pot</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">85%</div>
+                <div className="stat-label">Win Probability</div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
 
-      <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
-        <h2 style={{ marginBottom: '1rem', color: 'var(--color-accent)' }}>
-          Performance Optimized
-        </h2>
+      {/* Quick Actions */}
+      <motion.div 
+        className="card"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+      >
+        <h3 style={{ 
+          marginBottom: '1.5rem', 
+          color: 'var(--color-accent)',
+          fontSize: '1.25rem',
+          fontWeight: '600',
+          textAlign: 'center'
+        }}>
+          Quick Actions
+        </h3>
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-          gap: '1rem',
-          marginTop: '1.5rem'
+          gap: '1rem'
         }}>
-          <MetricCard title="Bundle Size" value="< 200KB" description="Gzipped" />
-          <MetricCard title="First Paint" value="< 1.2s" description="LCP Target" />
-          <MetricCard title="Interactivity" value="< 300ms" description="FID Target" />
-          <MetricCard title="Layout Shift" value="< 0.1" description="CLS Score" />
+          <Link to="/solver" className="card" style={{ 
+            textDecoration: 'none', 
+            color: 'inherit',
+            textAlign: 'center',
+            padding: '1.5rem'
+          }}>
+            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🤖</div>
+            <h4 style={{ marginBottom: '0.5rem', color: 'var(--color-accent)' }}>AI Solver</h4>
+            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
+              Advanced GTO analysis
+            </p>
+          </Link>
+          
+          <Link to="/analyzer" className="card" style={{ 
+            textDecoration: 'none', 
+            color: 'inherit',
+            textAlign: 'center',
+            padding: '1.5rem'
+          }}>
+            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📊</div>
+            <h4 style={{ marginBottom: '0.5rem', color: 'var(--color-accent)' }}>Hand Analysis</h4>
+            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
+              Detailed equity calculations
+            </p>
+          </Link>
+          
+          <Link to="/ranges" className="card" style={{ 
+            textDecoration: 'none', 
+            color: 'inherit',
+            textAlign: 'center',
+            padding: '1.5rem'
+          }}>
+            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🎯</div>
+            <h4 style={{ marginBottom: '0.5rem', color: 'var(--color-accent)' }}>Range Builder</h4>
+            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
+              Build optimal ranges
+            </p>
+          </Link>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 })
 
-interface FeatureCardProps {
-  icon: string
-  title: string
-  description: string
-  link: string
-  performance: string
-}
-
-const FeatureCard = memo<FeatureCardProps>(({ icon, title, description, link, performance }) => (
-  <Link 
-    to={link} 
-    className="card"
-    style={{ 
-      textDecoration: 'none', 
-      color: 'inherit',
-      transition: 'all 0.2s ease',
-      cursor: 'pointer',
-      border: '1px solid #374151'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-4px)'
-      e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
-      e.currentTarget.style.borderColor = 'var(--color-accent)'
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)'
-      e.currentTarget.style.boxShadow = 'var(--shadow-md)'
-      e.currentTarget.style.borderColor = '#374151'
-    }}
-  >
-    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{icon}</div>
-    <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>
-      {title}
-    </h3>
-    <p style={{ color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>
-      {description}
-    </p>
-    <div style={{ 
-      fontSize: '0.875rem', 
-      color: 'var(--color-success)', 
-      fontWeight: '500',
-      padding: '0.25rem 0.5rem',
-      backgroundColor: 'rgba(16, 185, 129, 0.1)',
-      borderRadius: '0.25rem',
-      display: 'inline-block'
-    }}>
-      ⚡ {performance}
-    </div>
-  </Link>
-))
-
-interface MetricCardProps {
-  title: string
-  value: string
-  description: string
-}
-
-const MetricCard = memo<MetricCardProps>(({ title, value, description }) => (
-  <div style={{ textAlign: 'center' }}>
-    <div style={{ 
-      fontSize: '1.5rem', 
-      fontWeight: '700', 
-      color: 'var(--color-success)',
-      marginBottom: '0.25rem'
-    }}>
-      {value}
-    </div>
-    <div style={{ fontWeight: '500', marginBottom: '0.25rem' }}>{title}</div>
-    <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-      {description}
-    </div>
-  </div>
-))
-
-FeatureCard.displayName = 'FeatureCard'
-MetricCard.displayName = 'MetricCard'
 HomePage.displayName = 'HomePage'
 
 export default HomePage
