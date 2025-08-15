@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState, useMemo } from 'react'
+import React, { memo, useCallback, useState, useMemo, useEffect } from 'react'
 import { usePokerStore } from '../store/pokerStore'
 import {
   usePlayerCards,
@@ -8,7 +8,9 @@ import {
   useHandDescription,
   useAnalysis,
   useGtoStrategy,
-  useGameContext
+  useGameContext,
+  useAIAvailable,
+  useModelMetrics
 } from '../store/selectors'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { CardDisplay } from '../components/ui/CardDisplay'
@@ -27,7 +29,10 @@ const PokerSolver = memo(() => {
     setLoading, 
     isLoading, 
     runFullAnalysis,
-    setGameContext
+    runAIAnalysis,
+    setGameContext,
+    initializeAI,
+    clearAICache
   } = usePokerStore()
   
   const playerCards = usePlayerCards()
@@ -37,6 +42,13 @@ const PokerSolver = memo(() => {
   const handDescription = useHandDescription()
   const analysis = useAnalysis()
   const gameContext = useGameContext()
+  const isAIAvailable = useAIAvailable()
+  const modelMetrics = useModelMetrics()
+
+  // Initialize AI on component mount
+  useEffect(() => {
+    initializeAI()
+  }, [initializeAI])
 
   // Enhanced calculation function with AI modeling
   const runAdvancedAnalysis = useCallback(async () => {
@@ -44,15 +56,20 @@ const PokerSolver = memo(() => {
     setLoading(true)
 
     try {
-      // Run comprehensive AI analysis
-      await runFullAnalysis()
+      // Run comprehensive AI analysis if available
+      if (isAIAvailable) {
+        await runAIAnalysis()
+      } else {
+        // Fallback to traditional analysis
+        await runFullAnalysis()
+      }
       
       const endTime = performance.now()
       setCalculationTime(endTime - startTime)
     } finally {
       setLoading(false)
     }
-  }, [runFullAnalysis, setLoading])
+  }, [runFullAnalysis, runAIAnalysis, setLoading, isAIAvailable])
 
   // Enhanced card selection with better validation
   const handlePlayerCardSelect = useCallback((cardString: string) => {
@@ -89,6 +106,65 @@ const PokerSolver = memo(() => {
     setGameContext(updates)
   }, [setGameContext])
 
+  // AI status indicator
+  const aiStatusIndicator = useMemo(() => {
+    if (!isAIAvailable) {
+      return (
+        <div style={{ 
+          padding: '0.5rem', 
+          backgroundColor: 'var(--color-warning)', 
+          color: 'white', 
+          borderRadius: '0.5rem',
+          marginBottom: '1rem'
+        }}>
+          ⚠️ AI features disabled - DeepSeek API key not configured
+        </div>
+      )
+    }
+
+    if (modelMetrics) {
+      return (
+        <div style={{ 
+          padding: '0.5rem', 
+          backgroundColor: 'var(--color-success)', 
+          color: 'white', 
+          borderRadius: '0.5rem',
+          marginBottom: '1rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <span>🤖 DeepSeek AI Active (v{modelMetrics.version})</span>
+          <button 
+            onClick={clearAICache}
+            style={{ 
+              background: 'rgba(255,255,255,0.2)', 
+              border: 'none', 
+              color: 'white',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '0.25rem',
+              cursor: 'pointer'
+            }}
+          >
+            Clear Cache
+          </button>
+        </div>
+      )
+    }
+
+    return (
+      <div style={{ 
+        padding: '0.5rem', 
+        backgroundColor: 'var(--color-info)', 
+        color: 'white', 
+        borderRadius: '0.5rem',
+        marginBottom: '1rem'
+      }}>
+        🔄 Initializing AI model...
+      </div>
+    )
+  }, [isAIAvailable, modelMetrics, clearAICache])
+
   return (
     <div className="poker-solver" style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
@@ -96,9 +172,11 @@ const PokerSolver = memo(() => {
           AI Poker Solver
         </h1>
         <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.125rem' }}>
-          Advanced GTO solver with machine learning-powered analysis
+          Advanced GTO solver powered by DeepSeek AI trained on professional poker data
         </p>
       </div>
+
+      {aiStatusIndicator}
 
       <GameContextControls
         gameContext={gameContext}
@@ -170,13 +248,26 @@ const PokerSolver = memo(() => {
       {/* Quick Analysis Section */}
       <div className="card" style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h3 style={{ color: 'var(--color-accent)' }}>Quick Analysis</h3>
+          <h3 style={{ color: 'var(--color-accent)' }}>
+            {isAIAvailable ? 'AI-Powered Analysis' : 'Quick Analysis'}
+          </h3>
           <button 
             onClick={runAdvancedAnalysis}
             disabled={isLoading || playerCards.length === 0}
             className="btn btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
           >
-            {isLoading ? <LoadingSpinner size="sm" /> : 'Run AI Analysis'}
+            {isLoading ? (
+              <>
+                <LoadingSpinner size="sm" />
+                Analyzing...
+              </>
+            ) : (
+              <>
+                {isAIAvailable ? '🤖' : '⚡'}
+                {isAIAvailable ? 'Run AI Analysis' : 'Run Analysis'}
+              </>
+            )}
           </button>
         </div>
 
@@ -201,9 +292,15 @@ const PokerSolver = memo(() => {
             value={`${calculationTime.toFixed(1)}ms`}
             color="var(--color-warning)"
           />
+          {modelMetrics && (
+            <MetricDisplay
+              label="AI Confidence"
+              value={`${(modelMetrics.averageConfidence * 100).toFixed(1)}%`}
+              color="var(--color-info)"
+            />
+          )}
         </div>
       </div>
-
 
       <AnalysisResults analysis={analysis} calculationTime={calculationTime} />
     </div>
