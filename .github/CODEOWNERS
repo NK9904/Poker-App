@@ -1,0 +1,50 @@
+# Global owners
+* @your-username
+
+# Core application files
+/src/ @your-username
+/src/components/ @your-username
+/src/pages/ @your-username
+/src/store/ @your-username
+/src/utils/ @your-username
+/src/hooks/ @your-username
+/src/types/ @your-username
+/src/constants/ @your-username
+
+# Configuration files
+package.json @your-username
+package-lock.json @your-username
+tsconfig.json @your-username
+tsconfig.node.json @your-username
+vite.config.ts @your-username
+eslint.config.js @your-username
+
+# Documentation
+README.md @your-username
+CONTRIBUTING.md @your-username
+CHANGELOG.md @your-username
+LICENSE @your-username
+SECURITY.md @your-username
+CODE_OF_CONDUCT.md @your-username
+
+# GitHub specific files
+.github/ @your-username
+.github/workflows/ @your-username
+.github/ISSUE_TEMPLATE/ @your-username
+.github/FUNDING.yml @your-username
+.github/dependabot.yml @your-username
+.github/CODEOWNERS @your-username
+.github/app.yml @your-username
+
+# Build and deployment
+public/ @your-username
+dist/ @your-username
+
+# Development tools
+.gitignore @your-username
+.env* @your-username
+
+# Performance and analysis
+PERFORMANCE_ANALYSIS.md @your-username
+DEPLOYMENT.md @your-username
+BUG_FIXES_AND_OPTIMIZATIONS.md @your-username

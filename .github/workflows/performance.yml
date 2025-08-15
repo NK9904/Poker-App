@@ -1,0 +1,143 @@
+name: Performance Monitoring
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  workflow_dispatch:  # Manual trigger
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    name: Lighthouse Performance Audit
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Start preview server
+        run: npm run preview &
+        env:
+          PORT: 4173
+          
+      - name: Wait for server
+        run: sleep 10
+        
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            http://localhost:4173
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          configPath: './.lighthouserc.json'
+          
+      - name: Comment PR
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Read Lighthouse results
+            const resultsPath = path.join(process.cwd(), '.lighthouseci');
+            const results = fs.readdirSync(resultsPath)
+              .filter(file => file.endsWith('.json'))
+              .map(file => JSON.parse(fs.readFileSync(path.join(resultsPath, file), 'utf8')));
+              
+            if (results.length > 0) {
+              const result = results[0];
+              const scores = result.lhr.categories;
+              
+              const comment = `## 🚀 Performance Report
+              
+              | Metric | Score |
+              |-------|-------|
+              | Performance | ${Math.round(scores.performance.score * 100)} |
+              | Accessibility | ${Math.round(scores.accessibility.score * 100)} |
+              | Best Practices | ${Math.round(scores['best-practices'].score * 100)} |
+              | SEO | ${Math.round(scores.seo.score * 100)} |
+              
+              **First Contentful Paint**: ${Math.round(result.lhr.audits['first-contentful-paint'].numericValue)}ms
+              **Largest Contentful Paint**: ${Math.round(result.lhr.audits['largest-contentful-paint'].numericValue)}ms
+              **First Input Delay**: ${Math.round(result.lhr.audits['max-potential-fid'].numericValue)}ms
+              **Cumulative Layout Shift**: ${result.lhr.audits['cumulative-layout-shift'].numericValue.toFixed(3)}
+              
+              [View full report](${result.lhr.lighthouseVersion})`;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+  bundle-analysis:
+    runs-on: ubuntu-latest
+    name: Bundle Size Analysis
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build and analyze bundle
+        run: npm run analyze
+        
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: dist/stats.html
+          retention-days: 30
+          
+      - name: Comment PR with bundle size
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Read bundle stats
+            const statsPath = path.join(process.cwd(), 'dist', 'stats.html');
+            if (fs.existsSync(statsPath)) {
+              const comment = `## 📦 Bundle Analysis
+              
+              Bundle analysis has been completed. You can view the detailed report in the workflow artifacts.
+              
+              **Bundle Analysis Report**: Available in workflow artifacts
+              
+              Please review the bundle size and ensure it remains within acceptable limits (< 200KB gzipped).`;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
