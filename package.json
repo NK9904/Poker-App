@@ -24,7 +24,6 @@
     "react-router-dom": "^6.30.1",
     "web-vitals": "^3.5.2",
     "zustand": "^4.5.7",
-    "@deepseek-ai/deepseek-js": "^1.0.0",
     "axios": "^1.6.0",
     "cheerio": "^1.0.0-rc.12",
     "puppeteer": "^21.0.0",
@@ -32,9 +31,6 @@
     "sqlite3": "^5.1.6",
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
-    "tensorflow": "^4.15.0",
-    "@tensorflow/tfjs-node": "^4.15.0",
-    "onnxruntime-node": "^1.16.3",
     "lodash": "^4.17.21",
     "dotenv": "^16.3.1"
   },
