@@ -2,7 +2,7 @@ import React, { Suspense } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { LoadingSpinner } from './components/LoadingSpinner'
-import { Navigation } from './components/Navigation'
+import Navigation from './components/Navigation'
 import { PerformancePanel } from './components/PerformancePanel'
 
 // Lazy load pages for better performance
