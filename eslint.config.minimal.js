@@ -16,7 +16,17 @@ export default [
       '**/*.test.ts',
       '**/*.test.tsx',
       'setupTests.ts',
+      'src/setupTests.ts',
     ],
+  },
+  {
+    files: ['**/*.test.ts', '**/*.test.tsx', 'setupTests.ts'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.jest,
+      },
+    },
   },
   {
     files: ['**/*.{ts,tsx}'],
@@ -88,7 +98,7 @@ export default [
       'react/no-render-return-value': 'error',
       'react/no-string-refs': 'error',
       'react/no-unescaped-entities': 'error',
-      'react/no-unknown-property': 'error',
+      'react/no-unknown-property': ['error', { ignore: ['emissive', 'emissiveIntensity', 'metalness', 'roughness', 'transparent', 'position', 'intensity'] }],
       'react/no-unsafe': 'warn',
       'react/self-closing-comp': 'warn',
       'react/sort-comp': 'warn',

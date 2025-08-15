@@ -29,20 +29,11 @@ export class ErrorBoundary extends Component<Props, State> {
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     this.setState({ errorInfo });
 
     // Log error with structured logging
-    logger.error('Error boundary caught an error', error, {
-      component: 'ErrorBoundary',
-      action: 'componentDidCatch',
-      errorId: this.state.errorId,
-      errorInfo: {
-        componentStack: errorInfo.componentStack,
-        errorMessage: error.message,
-        errorStack: error.stack,
-      },
-    });
+    logger.error('Error boundary caught an error', error);
 
     // Performance monitoring: Track errors
     if ('performance' in window && 'mark' in performance) {
@@ -140,7 +131,7 @@ What actually happened?
     window.open(url, '_blank');
   };
 
-  render(): ReactNode {
+  override render(): ReactNode {
     if (this.state.hasError) {
       // Use custom fallback if provided
       if (this.props.fallback) {
@@ -160,7 +151,7 @@ What actually happened?
               </h2>
 
               <p className='text-gray-400 mb-6 text-sm'>
-                We're sorry, but something unexpected happened. Our team has
+                We&apos;re sorry, but something unexpected happened. Our team has
                 been notified.
               </p>
 

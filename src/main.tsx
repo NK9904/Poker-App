@@ -27,18 +27,14 @@ getTTFB(sendToAnalytics);
 // Enhanced Service Worker registration with error handling
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    const startTime = performance.now();
-
-    navigator.serviceWorker
-      .register('/sw.js')
-      .then(registration => {
-        const duration = performance.now() - startTime;
+            navigator.serviceWorker
+          .register('/sw.js')
+          .then(registration => {
 
         if (import.meta.env.DEV) {
           logger.log(
             'SW registered:',
-            registration,
-            `(${duration.toFixed(2)}ms)`
+            registration
           );
         }
 
@@ -132,11 +128,11 @@ class ErrorBoundary extends React.Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    logger.error('Application error:', error, errorInfo);
+  override componentDidCatch(error: Error, _errorInfo: React.ErrorInfo) {
+    logger.error('Application error:', error);
   }
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       return (
         <div

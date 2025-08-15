@@ -61,11 +61,11 @@ describe('Model Performance Benchmarks', () => {
       iterations,
       totalTime: times.reduce((a, b) => a + b, 0),
       avgTime: times.reduce((a, b) => a + b, 0) / times.length,
-      minTime: times[0],
-      maxTime: times[times.length - 1],
-      p50: times[Math.floor(times.length * 0.5)],
-      p95: times[Math.floor(times.length * 0.95)],
-      p99: times[Math.floor(times.length * 0.99)],
+      minTime: times[0] || 0,
+      maxTime: times[times.length - 1] || 0,
+      p50: times[Math.floor(times.length * 0.5)] || 0,
+      p95: times[Math.floor(times.length * 0.95)] || 0,
+      p99: times[Math.floor(times.length * 0.99)] || 0,
     };
   };
 

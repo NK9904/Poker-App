@@ -46,7 +46,7 @@ export function usePerformance() {
       (m: PerformanceMetric) => m.name === 'fps'
     );
     const fps =
-      fpsMetrics.length > 0 ? fpsMetrics[fpsMetrics.length - 1].value : 0;
+      fpsMetrics.length > 0 ? fpsMetrics[fpsMetrics.length - 1]?.value || 0 : 0;
 
     setData({
       memory,

@@ -25,7 +25,7 @@ export function observeLongTasks(threshold = 50): void {
       });
 
       observer.observe({ entryTypes: ['longtask'] });
-    } catch (error) {
+    } catch (_error) {
       logger.log('Long task observer not supported');
     }
   }
@@ -47,7 +47,7 @@ export function observeLayoutShifts(): void {
       });
 
       observer.observe({ entryTypes: ['layout-shift'] });
-    } catch (error) {
+    } catch (_error) {
       logger.log('Layout shift observer not supported');
     }
   }
@@ -228,7 +228,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
+  let timeout: ReturnType<typeof setTimeout> | null = null;
 
   return (...args: Parameters<T>) => {
     if (timeout) {
