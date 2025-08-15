@@ -58,7 +58,7 @@ class Logger {
 
     if (isDevelopment) {
       const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
-      if (context.component) {
+      if (context?.component) {
         console[level](`${prefix} [${context.component}]`, message, data || '');
       } else {
         console[level](`${prefix}`, message, data || '');
@@ -92,7 +92,7 @@ class Logger {
     // In production, you might want to send to an error tracking service
     if (isProduction && error instanceof Error) {
       // Example: Sentry.captureException(error)
-      this.context.errorId = crypto.randomUUID();
+      this.context['errorId'] = crypto.randomUUID();
     }
   }
 

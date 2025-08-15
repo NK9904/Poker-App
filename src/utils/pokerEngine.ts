@@ -89,9 +89,7 @@ export class PokerEngine {
       const blob = new Blob([workerCode], { type: 'application/javascript' });
       this.worker = new Worker(URL.createObjectURL(blob));
     } catch {
-      console.warn(
-        'Web Worker not available, falling back to main thread calculations'
-      );
+      // Web Worker not available, falling back to main thread calculations
     }
   }
 
@@ -121,7 +119,7 @@ export class PokerEngine {
   }
 
   private performHandEvaluation(cards: Card[]): HandEvaluation {
-    const ranks = cards.map(c => RANK_VALUES[c.rank]).sort((a, b) => b - a);
+    const ranks = cards.map(c => RANK_VALUES[c.rank]).filter((rank): rank is number => rank !== undefined).sort((a, b) => b - a);
     const suits = cards.map(c => c.suit);
 
     // Check for flush
@@ -152,7 +150,7 @@ export class PokerEngine {
     if (isFlush && isStraight) {
       return {
         rank: HandRank.STRAIGHT_FLUSH,
-        strength: 0.95 + ranks[0] / 1000,
+        strength: 0.95 + (ranks[0] || 0) / 1000,
         description: 'Straight Flush',
         kickers: [],
       };
@@ -161,7 +159,7 @@ export class PokerEngine {
     if (maxCount === 4) {
       return {
         rank: HandRank.FOUR_OF_A_KIND,
-        strength: 0.85 + ranks[0] / 1000,
+        strength: 0.85 + (ranks[0] || 0) / 1000,
         description: 'Four of a Kind',
         kickers: ranks.slice(1),
       };
@@ -170,7 +168,7 @@ export class PokerEngine {
     if (counts[0] === 3 && counts[1] === 2) {
       return {
         rank: HandRank.FULL_HOUSE,
-        strength: 0.75 + ranks[0] / 1000,
+        strength: 0.75 + (ranks[0] || 0) / 1000,
         description: 'Full House',
         kickers: [],
       };
@@ -179,7 +177,7 @@ export class PokerEngine {
     if (isFlush) {
       return {
         rank: HandRank.FLUSH,
-        strength: 0.65 + ranks[0] / 1000,
+        strength: 0.65 + (ranks[0] || 0) / 1000,
         description: 'Flush',
         kickers: ranks.slice(1),
       };
@@ -188,7 +186,7 @@ export class PokerEngine {
     if (isStraight) {
       return {
         rank: HandRank.STRAIGHT,
-        strength: 0.55 + ranks[0] / 1000,
+        strength: 0.55 + (ranks[0] || 0) / 1000,
         description: 'Straight',
         kickers: [],
       };
@@ -197,7 +195,7 @@ export class PokerEngine {
     if (maxCount === 3) {
       return {
         rank: HandRank.THREE_OF_A_KIND,
-        strength: 0.45 + ranks[0] / 1000,
+        strength: 0.45 + (ranks[0] || 0) / 1000,
         description: 'Three of a Kind',
         kickers: ranks.slice(1),
       };
@@ -206,7 +204,7 @@ export class PokerEngine {
     if (counts.filter(c => c === 2).length === 2) {
       return {
         rank: HandRank.TWO_PAIR,
-        strength: 0.35 + ranks[0] / 1000,
+        strength: 0.35 + (ranks[0] || 0) / 1000,
         description: 'Two Pair',
         kickers: ranks.slice(2),
       };
@@ -215,7 +213,7 @@ export class PokerEngine {
     if (maxCount === 2) {
       return {
         rank: HandRank.PAIR,
-        strength: 0.25 + ranks[0] / 1000,
+        strength: 0.25 + (ranks[0] || 0) / 1000,
         description: 'Pair',
         kickers: ranks.slice(1),
       };
@@ -223,7 +221,7 @@ export class PokerEngine {
 
     return {
       rank: HandRank.HIGH_CARD,
-      strength: ranks[0] / 100,
+      strength: (ranks[0] || 0) / 100,
       description: 'High Card',
       kickers: ranks.slice(1),
     };
@@ -237,7 +235,7 @@ export class PokerEngine {
 
     // Check for regular straight
     for (let i = 0; i <= uniqueRanks.length - 5; i++) {
-      if (uniqueRanks[i] - uniqueRanks[i + 4] === 4) {
+      if ((uniqueRanks[i] || 0) - (uniqueRanks[i + 4] || 0) === 4) {
         return true;
       }
     }
@@ -439,7 +437,7 @@ export class PokerEngine {
       actions.push({
         action: 'raise',
         frequency: 0.8,
-        sizing: potSize * 1.0,
+        sizing: Number(potSize) * 1.0,
         expectedValue: handStrength * potSize * 1.5,
         reasoning: 'Strong hand strength suggests raising',
       });
@@ -587,7 +585,7 @@ export class PokerEngine {
       i++
     ) {
       if (eval1.kickers[i] !== eval2.kickers[i]) {
-        return eval1.kickers[i] - eval2.kickers[i];
+        return (eval1.kickers[i] || 0) - (eval2.kickers[i] || 0);
       }
     }
 

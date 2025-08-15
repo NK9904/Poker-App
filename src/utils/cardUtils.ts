@@ -34,8 +34,8 @@ export class CardUtils {
     const [rank, suit] = cardString.split('');
 
     if (
-      !CARD_RANKS.includes(rank as any) ||
-      !CARD_SUITS.includes(suit as any)
+      !CARD_RANKS.includes(rank as Card['rank']) ||
+      !CARD_SUITS.includes(suit as Card['suit'])
     ) {
       return null;
     }
@@ -98,7 +98,11 @@ export class CardUtils {
     const deck = [...cards];
     for (let i = deck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [deck[i], deck[j]] = [deck[j], deck[i]];
+      const temp = deck[i];
+      if (temp !== undefined && deck[j] !== undefined) {
+        deck[i] = deck[j]!;
+        deck[j] = temp;
+      }
     }
     return deck;
   }

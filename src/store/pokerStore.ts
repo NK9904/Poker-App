@@ -239,8 +239,8 @@ export const usePokerStore = create<PokerState>()(
       try {
         const config = {
           ollamaUrl:
-            import.meta.env.VITE_OLLAMA_URL || 'http://localhost:11434',
-          model: import.meta.env.VITE_OLLAMA_MODEL || 'llama3.2:3b',
+            import.meta.env['VITE_OLLAMA_URL'] || 'http://localhost:11434',
+          model: import.meta.env['VITE_OLLAMA_MODEL'] || 'llama3.2:3b',
           maxTokens: 4000,
           temperature: 0.1,
         };

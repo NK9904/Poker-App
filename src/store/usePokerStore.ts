@@ -140,7 +140,7 @@ export const usePokerStore = create<PokerState>()(
             lastUpdated: new Date(),
           },
         });
-      } catch (error) {
+      } catch (_error) {
         // Error is handled silently in production
       }
     },
@@ -181,7 +181,7 @@ export const usePokerStore = create<PokerState>()(
           },
           lastCalculation: new Date(),
         });
-      } catch (error) {
+      } catch (_error) {
         // Error is handled silently in production
       } finally {
         set({ isLoading: false });

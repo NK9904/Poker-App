@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { resolve } from 'path'
+import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
   plugins: [
@@ -80,18 +81,18 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': resolve(process.cwd(), 'src'),
-      '@/components': resolve(process.cwd(), 'src/components'),
-      '@/utils': resolve(process.cwd(), 'src/utils'),
-      '@/hooks': resolve(process.cwd(), 'src/hooks'),
-      '@/types': resolve(process.cwd(), 'src/types'),
-      '@/store': resolve(process.cwd(), 'src/store'),
-      '@/constants': resolve(process.cwd(), 'src/constants'),
-      '@/pages': resolve(process.cwd(), 'src/pages'),
-      '@/ai': resolve(process.cwd(), 'src/ai')
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@/components': fileURLToPath(new URL('./src/components', import.meta.url)),
+      '@/utils': fileURLToPath(new URL('./src/utils', import.meta.url)),
+      '@/hooks': fileURLToPath(new URL('./src/hooks', import.meta.url)),
+      '@/types': fileURLToPath(new URL('./src/types', import.meta.url)),
+      '@/store': fileURLToPath(new URL('./src/store', import.meta.url)),
+      '@/constants': fileURLToPath(new URL('./src/constants', import.meta.url)),
+      '@/pages': fileURLToPath(new URL('./src/pages', import.meta.url)),
+      '@/ai': fileURLToPath(new URL('./src/ai', import.meta.url))
     }
   },
-      build: {
+  build: {
       target: 'esnext',
       minify: 'terser',
       cssMinify: true,
@@ -143,9 +144,7 @@ export default defineConfig({
         }
       }
     },
-    chunkSizeWarningLimit: 1000,
     sourcemap: false, // Disable source maps for production
-    reportCompressedSize: true,
     // Enable CSS code splitting
     cssCodeSplit: true
   },
