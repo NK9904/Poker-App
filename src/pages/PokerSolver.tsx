@@ -4,7 +4,10 @@ import { LoadingSpinner } from '../components/LoadingSpinner'
 
 const PokerSolver = memo(() => {
   const [calculationTime, setCalculationTime] = useState<number>(0)
-  const { setPlayerCards, setBoardCards, setLoading, isLoading } = usePokerStore()
+  const setPlayerCards = usePokerStore(s => s.setPlayerCards)
+  const setBoardCards = usePokerStore(s => s.setBoardCards)
+  const setLoading = usePokerStore(s => s.setLoading)
+  const isLoading = usePokerStore(s => s.isLoading)
   const playerCards = usePlayerCards()
   const boardCards = useBoardCards()
   const handStrength = useHandStrength()
@@ -18,12 +21,6 @@ const PokerSolver = memo(() => {
     try {
       // Simulate complex poker calculations
       await new Promise(resolve => setTimeout(resolve, 50)) // Minimal delay for UX
-      
-      // In a real application, this would:
-      // 1. Use Web Workers for heavy calculations
-      // 2. Implement Monte Carlo simulations
-      // 3. Calculate GTO solutions
-      // 4. Use WebAssembly for performance-critical code
       
       const endTime = performance.now()
       setCalculationTime(endTime - startTime)
