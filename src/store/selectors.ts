@@ -26,6 +26,10 @@ export const useAIAvailable = () => usePokerStore(state => state.isAIAvailable)
 export const useModelMetrics = () => usePokerStore(state => state.modelMetrics)
 export const useAIModel = () => usePokerStore(state => state.aiModel)
 
+// 3D AI Assistant selectors
+export const useAIAssistantVisible = () => usePokerStore(state => state.aiAssistantVisible)
+export const useSelectedAction = () => usePokerStore(state => state.selectedAction)
+
 // Computed selectors
 export const useHandStrength = () => {
   const handEvaluation = useHandEvaluation()
@@ -148,8 +152,52 @@ export const useAnalysisSource = () => {
   const aiAnalysis = useAIAnalysis()
   
   if (isAIAvailable && aiAnalysis) {
-    return 'O3 AI'
+    return 'Open-Source AI'
   }
   
   return 'Traditional Engine'
+}
+
+// 3D AI Assistant computed selectors
+export const useAIAssistantStatus = () => {
+  const isLoading = useLoading()
+  const aiAnalysis = useAIAnalysis()
+  const isAIAvailable = useAIAvailable()
+  
+  if (!isAIAvailable) {
+    return 'unavailable'
+  }
+  
+  if (isLoading) {
+    return 'analyzing'
+  }
+  
+  if (aiAnalysis) {
+    return 'ready'
+  }
+  
+  return 'waiting'
+}
+
+export const useAIAssistantActions = () => {
+  const aiActions = useAIActions()
+  const selectedAction = useSelectedAction()
+  
+  return {
+    actions: aiActions,
+    selectedAction,
+    hasActions: aiActions.length > 0
+  }
+}
+
+export const useAIAssistantMetrics = () => {
+  const modelMetrics = useModelMetrics()
+  const aiAnalysis = useAIAnalysis()
+  
+  return {
+    confidence: aiAnalysis?.confidence || 0,
+    modelVersion: modelMetrics?.version || 'Unknown',
+    cacheSize: modelMetrics?.cacheSize || 0,
+    isAvailable: modelMetrics?.modelAvailable || false
+  }
 }

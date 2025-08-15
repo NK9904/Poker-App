@@ -5,10 +5,11 @@ import type {
   HandRange, 
   AdvancedAnalysis, 
   GameContext,
-  ModelMetrics
+  ModelMetrics,
+  PokerAction
 } from '../types/poker'
 import { pokerEngine } from '../utils/pokerEngine'
-import { O3PokerAI } from '../ai/O3PokerAI'
+import { OpenSourcePokerAI } from '../ai/OpenSourcePokerAI'
 
 interface PokerState {
   // Current hand
@@ -30,9 +31,13 @@ interface PokerState {
   gameContext: GameContext
   
   // AI model state
-  aiModel: O3PokerAI | null
+  aiModel: OpenSourcePokerAI | null
   modelMetrics: ModelMetrics | null
   isAIAvailable: boolean
+  
+  // 3D AI Assistant state
+  aiAssistantVisible: boolean
+  selectedAction: PokerAction | null
   
   // Actions
   setPlayerCards: (cards: Card[] | ((prev: Card[]) => Card[])) => void
@@ -52,6 +57,12 @@ interface PokerState {
   initializeAI: () => Promise<void>
   getModelMetrics: () => ModelMetrics | null
   clearAICache: () => void
+  
+  // 3D AI Assistant actions
+  toggleAIAssistant: () => void
+  setAIAssistantVisible: (visible: boolean) => void
+  selectAction: (action: PokerAction) => void
+  clearSelectedAction: () => void
 }
 
 const initialState = {
@@ -74,7 +85,9 @@ const initialState = {
   },
   aiModel: null,
   modelMetrics: null,
-  isAIAvailable: false
+  isAIAvailable: false,
+  aiAssistantVisible: false,
+  selectedAction: null
 }
 
 export const usePokerStore = create<PokerState>()(
@@ -192,7 +205,7 @@ export const usePokerStore = create<PokerState>()(
             ...metrics,
             lastUpdated: new Date(),
             accuracy: 0.85, // This would come from model validation
-            version: '2.0.0'
+            version: 'OpenSource-2.0.0'
           }
         })
         
@@ -206,25 +219,27 @@ export const usePokerStore = create<PokerState>()(
     initializeAI: async () => {
       try {
         const config = {
-          apiKey: import.meta.env.VITE_OPENAI_API_KEY || '',
-          model: 'gpt-4o',
+          ollamaUrl: import.meta.env.VITE_OLLAMA_URL || 'http://localhost:11434',
+          model: import.meta.env.VITE_OLLAMA_MODEL || 'llama3.2:3b',
           maxTokens: 4000,
           temperature: 0.1
         }
         
-        if (!config.apiKey) {
-          console.warn('OpenAI API key not found, AI features will be disabled')
-          set({ isAIAvailable: false })
-          return
-        }
+        const aiModel = new OpenSourcePokerAI(config)
         
-        const aiModel = new O3PokerAI(config)
+        // Check if model is available
+        const isAvailable = aiModel.isAvailable()
+        
         set({ 
           aiModel,
-          isAIAvailable: true
+          isAIAvailable: isAvailable
         })
         
-        console.log('O3 AI model initialized successfully')
+        if (isAvailable) {
+          console.log('Open-source AI model initialized successfully')
+        } else {
+          console.log('Open-source AI model initialized with local fallback')
+        }
         
       } catch (error) {
         console.error('Failed to initialize AI model:', error)
@@ -243,6 +258,31 @@ export const usePokerStore = create<PokerState>()(
         state.aiModel.clearCache()
         console.log('AI cache cleared')
       }
+    },
+
+    toggleAIAssistant: () => {
+      const state = get()
+      set({ aiAssistantVisible: !state.aiAssistantVisible })
+    },
+
+    setAIAssistantVisible: (visible) => {
+      set({ aiAssistantVisible: visible })
+    },
+
+    selectAction: (action) => {
+      set({ selectedAction: action })
+      
+      // Auto-hide assistant after selection
+      setTimeout(() => {
+        const state = get()
+        if (state.selectedAction === action) {
+          set({ aiAssistantVisible: false, selectedAction: null })
+        }
+      }, 2000)
+    },
+
+    clearSelectedAction: () => {
+      set({ selectedAction: null })
     }
   }))
 )

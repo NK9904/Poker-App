@@ -120,6 +120,7 @@ export interface ModelMetrics {
   lastUpdated: Date
   accuracy: number
   version: string
+  modelAvailable?: boolean
 }
 
 export interface ScrapingStats {

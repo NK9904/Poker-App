@@ -1,156 +1,289 @@
-import { memo } from 'react'
+import React from 'react'
+import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { 
+  Brain, 
+  Zap, 
+  Target, 
+  BarChart3, 
+  Bot, 
+  Star, 
+  ArrowRight,
+  Play,
+  Code,
+  Shield,
+  Globe,
+  Users,
+  CheckCircle
+} from 'lucide-react'
+import { usePokerStore } from '../store/pokerStore'
+import { useAIAvailable, useModelMetrics } from '../store/selectors'
 
-const HomePage = memo(() => {
+const HomePage: React.FC = () => {
+  const { toggleAIAssistant } = usePokerStore()
+  const isAIAvailable = useAIAvailable()
+  const modelMetrics = useModelMetrics()
+
+  const features = [
+    {
+      icon: Brain,
+      title: 'AI-Powered Analysis',
+      description: 'Advanced GTO solver using open-source AI models for optimal poker strategy',
+      color: 'from-blue-600 to-purple-600'
+    },
+    {
+      icon: Bot,
+      title: '3D AI Assistant',
+      description: 'Immersive 3D interface with real-time poker move suggestions',
+      color: 'from-green-600 to-teal-600'
+    },
+    {
+      icon: Target,
+      title: 'Range Calculator',
+      description: 'Professional-grade range analysis with GTO principles',
+      color: 'from-orange-600 to-red-600'
+    },
+    {
+      icon: BarChart3,
+      title: 'Hand Analyzer',
+      description: 'Detailed hand breakdown with equity calculations',
+      color: 'from-purple-600 to-pink-600'
+    }
+  ]
+
+  const benefits = [
+    {
+      icon: Zap,
+      title: 'Lightning Fast',
+      description: 'Optimized performance with instant analysis results'
+    },
+    {
+      icon: Shield,
+      title: 'Privacy First',
+      description: 'Open-source AI runs locally, keeping your data secure'
+    },
+    {
+      icon: Globe,
+      title: 'Cost Effective',
+      description: 'No API fees - use powerful AI models for free'
+    },
+    {
+      icon: Users,
+      title: 'Community Driven',
+      description: 'Built by poker players, for poker players'
+    }
+  ]
+
   return (
-    <div className="home-page" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <h1 style={{ 
-          fontSize: '3rem', 
-          fontWeight: '700', 
-          marginBottom: '1rem',
-          background: 'linear-gradient(135deg, var(--color-accent), #8b5cf6)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text'
-        }}>
-          Poker AI Solver
-        </h1>
-        <p style={{ 
-          fontSize: '1.25rem', 
-          color: 'var(--color-text-secondary)', 
-          maxWidth: '600px', 
-          margin: '0 auto' 
-        }}>
-          Advanced AI-powered poker analysis with optimized performance for lightning-fast calculations.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="container mx-auto px-4 py-20 lg:py-32">
+          <motion.div 
+            className="text-center max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.div 
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600/20 border border-blue-500/30 rounded-full text-blue-400 text-sm mb-6"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Star className="w-4 h-4" />
+              <span>Powered by Open-Source AI</span>
+            </motion.div>
 
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-        gap: '2rem',
-        marginBottom: '3rem'
-      }}>
-        <FeatureCard
-          icon="🧠"
-          title="Poker Solver"
-          description="Advanced GTO solver for optimal play decisions"
-          link="/solver"
-          performance="< 100ms calculations"
-        />
-        <FeatureCard
-          icon="🔍"
-          title="Hand Analyzer"
-          description="Detailed hand analysis with equity calculations"
-          link="/analyzer"
-          performance="Real-time analysis"
-        />
-        <FeatureCard
-          icon="📊"
-          title="Range Calculator"
-          description="Pre-flop and post-flop range construction tools"
-          link="/ranges"
-          performance="Instant range updates"
-        />
-      </div>
+            <h1 className="text-5xl lg:text-7xl font-bold text-gradient mb-6">
+              Master Poker with
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                AI Intelligence
+              </span>
+            </h1>
 
-      <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
-        <h2 style={{ marginBottom: '1rem', color: 'var(--color-accent)' }}>
-          Performance Optimized
-        </h2>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-          gap: '1rem',
-          marginTop: '1.5rem'
-        }}>
-          <MetricCard title="Bundle Size" value="< 200KB" description="Gzipped" />
-          <MetricCard title="First Paint" value="< 1.2s" description="LCP Target" />
-          <MetricCard title="Interactivity" value="< 300ms" description="FID Target" />
-          <MetricCard title="Layout Shift" value="< 0.1" description="CLS Score" />
+            <p className="text-xl lg:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+              Advanced GTO solver with 3D AI assistant. Get professional-level poker analysis 
+              using open-source AI models - no fees, no limits.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link
+                to="/solver"
+                className="btn btn-primary text-lg px-8 py-4 flex items-center gap-2 group"
+              >
+                <Play className="w-5 h-5" />
+                Start Analyzing
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+
+              {isAIAvailable && (
+                <button
+                  onClick={toggleAIAssistant}
+                  className="btn btn-secondary text-lg px-8 py-4 flex items-center gap-2"
+                >
+                  <Bot className="w-5 h-5" />
+                  Try 3D Assistant
+                </button>
+              )}
+            </div>
+
+            {/* AI Status */}
+            {modelMetrics && (
+              <motion.div 
+                className="mt-8 p-4 bg-green-600/20 border border-green-500/30 rounded-xl inline-block"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <div className="flex items-center gap-3 text-green-400">
+                  <CheckCircle className="w-5 h-5" />
+                  <span>AI Model Active - {modelMetrics.version}</span>
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
         </div>
-      </div>
+
+        {/* Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-600/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl"></div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+              Everything You Need to
+              <br />
+              <span className="text-gradient">Dominate the Tables</span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              Professional-grade tools that give you the edge in any poker game
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon
+              return (
+                <motion.div
+                  key={feature.title}
+                  className="card group hover:scale-105 transition-transform duration-300"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  <div className={`w-12 h-12 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
+                  <p className="text-gray-300">{feature.description}</p>
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-20 bg-gray-800/30">
+        <div className="container mx-auto px-4">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+              Why Choose
+              <br />
+              <span className="text-gradient">Open-Source AI</span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              Experience the future of poker analysis without the traditional costs
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {benefits.map((benefit, index) => {
+              const Icon = benefit.icon
+              return (
+                <motion.div
+                  key={benefit.title}
+                  className="text-center"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Icon className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">{benefit.title}</h3>
+                  <p className="text-gray-300">{benefit.description}</p>
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <motion.div 
+            className="text-center"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+              Ready to Transform
+              <br />
+              <span className="text-gradient">Your Poker Game?</span>
+            </h2>
+            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+              Join thousands of players who are already using AI to improve their game
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link
+                to="/solver"
+                className="btn btn-primary text-lg px-8 py-4 flex items-center gap-2"
+              >
+                <Brain className="w-5 h-5" />
+                Start Free Analysis
+              </Link>
+              
+              <a
+                href="https://github.com/your-repo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary text-lg px-8 py-4 flex items-center gap-2"
+              >
+                <Code className="w-5 h-5" />
+                View Source Code
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </section>
     </div>
   )
-})
-
-interface FeatureCardProps {
-  icon: string
-  title: string
-  description: string
-  link: string
-  performance: string
 }
-
-const FeatureCard = memo<FeatureCardProps>(({ icon, title, description, link, performance }) => (
-  <Link 
-    to={link} 
-    className="card"
-    style={{ 
-      textDecoration: 'none', 
-      color: 'inherit',
-      transition: 'all 0.2s ease',
-      cursor: 'pointer',
-      border: '1px solid #374151'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-4px)'
-      e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
-      e.currentTarget.style.borderColor = 'var(--color-accent)'
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)'
-      e.currentTarget.style.boxShadow = 'var(--shadow-md)'
-      e.currentTarget.style.borderColor = '#374151'
-    }}
-  >
-    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{icon}</div>
-    <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>
-      {title}
-    </h3>
-    <p style={{ color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>
-      {description}
-    </p>
-    <div style={{ 
-      fontSize: '0.875rem', 
-      color: 'var(--color-success)', 
-      fontWeight: '500',
-      padding: '0.25rem 0.5rem',
-      backgroundColor: 'rgba(16, 185, 129, 0.1)',
-      borderRadius: '0.25rem',
-      display: 'inline-block'
-    }}>
-      ⚡ {performance}
-    </div>
-  </Link>
-))
-
-interface MetricCardProps {
-  title: string
-  value: string
-  description: string
-}
-
-const MetricCard = memo<MetricCardProps>(({ title, value, description }) => (
-  <div style={{ textAlign: 'center' }}>
-    <div style={{ 
-      fontSize: '1.5rem', 
-      fontWeight: '700', 
-      color: 'var(--color-success)',
-      marginBottom: '0.25rem'
-    }}>
-      {value}
-    </div>
-    <div style={{ fontWeight: '500', marginBottom: '0.25rem' }}>{title}</div>
-    <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-      {description}
-    </div>
-  </div>
-))
-
-FeatureCard.displayName = 'FeatureCard'
-MetricCard.displayName = 'MetricCard'
-HomePage.displayName = 'HomePage'
 
 export default HomePage
