@@ -199,7 +199,7 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): T {
-  let timeout: NodeJS.Timeout | null = null
+  let timeout: number | null = null
   
   return ((...args: any[]) => {
     if (timeout) clearTimeout(timeout)

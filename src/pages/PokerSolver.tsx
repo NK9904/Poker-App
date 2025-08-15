@@ -32,26 +32,52 @@ const PokerSolver = memo(() => {
     }
   }, [setLoading])
 
-  // Memoized card selection handlers
+  // Memoized card selection handlers with proper validation
   const handlePlayerCardSelect = useCallback((cardString: string) => {
+    if (!cardString || cardString.length !== 2 || playerCards.length >= 2) return
+    
     const [rank, suit] = cardString.split('')
     const suitMap = { h: 'hearts', d: 'diamonds', c: 'clubs', s: 'spades' } as const
+    const validRanks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
     
-    setPlayerCards([
-      ...playerCards,
-      { rank: rank as any, suit: suitMap[suit as keyof typeof suitMap] }
+    if (!validRanks.includes(rank) || !suitMap[suit as keyof typeof suitMap]) return
+    
+    // Check if card is already selected
+    const allSelectedCards = [...playerCards, ...boardCards]
+    const isCardSelected = allSelectedCards.some(card => 
+      card.rank === rank && card.suit === suitMap[suit as keyof typeof suitMap]
+    )
+    
+    if (isCardSelected) return
+    
+    setPlayerCards(prev => [
+      ...prev,
+      { rank, suit: suitMap[suit as keyof typeof suitMap] }
     ])
-  }, [playerCards, setPlayerCards])
+  }, [playerCards, boardCards, setPlayerCards])
 
   const handleBoardCardSelect = useCallback((cardString: string) => {
+    if (!cardString || cardString.length !== 2 || boardCards.length >= 5) return
+    
     const [rank, suit] = cardString.split('')
     const suitMap = { h: 'hearts', d: 'diamonds', c: 'clubs', s: 'spades' } as const
+    const validRanks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
     
-    setBoardCards([
-      ...boardCards,
-      { rank: rank as any, suit: suitMap[suit as keyof typeof suitMap] }
+    if (!validRanks.includes(rank) || !suitMap[suit as keyof typeof suitMap]) return
+    
+    // Check if card is already selected
+    const allSelectedCards = [...playerCards, ...boardCards]
+    const isCardSelected = allSelectedCards.some(card => 
+      card.rank === rank && card.suit === suitMap[suit as keyof typeof suitMap]
+    )
+    
+    if (isCardSelected) return
+    
+    setBoardCards(prev => [
+      ...prev,
+      { rank, suit: suitMap[suit as keyof typeof suitMap] }
     ])
-  }, [boardCards, setBoardCards])
+  }, [playerCards, boardCards, setBoardCards])
 
   // Memoized card options for performance
   const cardOptions = useMemo(() => {

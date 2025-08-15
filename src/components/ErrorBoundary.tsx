@@ -22,9 +22,20 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Error caught by boundary:', error, errorInfo)
     
+    // Performance monitoring: Track errors
+    if ('performance' in window && 'mark' in performance) {
+      performance.mark('error-boundary-triggered')
+    }
+    
     // In production, send to error reporting service
     if (process.env.NODE_ENV === 'production') {
       // Send to analytics/error reporting
+      try {
+        // Example: Send to analytics service
+        // analytics.track('error', { error: error.message, stack: error.stack })
+      } catch (reportError) {
+        console.error('Failed to report error:', reportError)
+      }
     }
   }
 
