@@ -378,6 +378,35 @@ export class PokerEngine {
   }
 
   /**
+   * Compare two hands
+   */
+  compareHands(hand1: Card[], hand2: Card[], board: Card[] = []): number {
+    const eval1 = this.evaluateHand(hand1, board)
+    const eval2 = this.evaluateHand(hand2, board)
+    
+    if (eval1.rank !== eval2.rank) {
+      return eval2.rank - eval1.rank // Lower rank number is better
+    }
+    
+    // Compare kickers if same rank
+    for (let i = 0; i < Math.min(eval1.kickers.length, eval2.kickers.length); i++) {
+      if (eval1.kickers[i] !== eval2.kickers[i]) {
+        return eval1.kickers[i] - eval2.kickers[i]
+      }
+    }
+    
+    return 0 // Tie
+  }
+
+  /**
+   * Clear cache to free memory
+   */
+  clearCache(): void {
+    this.evaluationCache.clear()
+    this.equityCache.clear()
+  }
+
+  /**
    * Clean up resources
    */
   destroy() {
@@ -385,8 +414,14 @@ export class PokerEngine {
       this.worker.terminate()
       this.worker = null
     }
-    this.evaluationCache.clear()
-    this.equityCache.clear()
+    this.clearCache()
+  }
+
+  /**
+   * Alias for destroy for test compatibility
+   */
+  cleanup() {
+    this.destroy()
   }
 }
 
