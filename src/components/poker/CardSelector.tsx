@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import type { Card } from '../../types/poker'
 import { CardUtils } from '../../utils/cardUtils'
 

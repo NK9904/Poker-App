@@ -148,7 +148,7 @@ export const useAnalysisSource = () => {
   const aiAnalysis = useAIAnalysis()
   
   if (isAIAvailable && aiAnalysis) {
-    return 'DeepSeek AI'
+    return 'O3 AI'
   }
   
   return 'Traditional Engine'

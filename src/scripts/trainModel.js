@@ -12,9 +12,9 @@ const __dirname = path.dirname(__filename)
 class ModelTrainer {
   constructor() {
     this.db = null
-    this.deepSeekConfig = {
-      apiKey: process.env.DEEPSEEK_API_KEY,
-      model: 'deepseek-chat',
+    this.o3Config = {
+      apiKey: process.env.OPENAI_API_KEY,
+      model: 'gpt-4o',
       maxTokens: 4000,
       temperature: 0.1
     }
@@ -109,12 +109,12 @@ Based on professional poker data, what is the optimal action in this situation?`
   }
 
   async fineTuneModel(trainingExamples) {
-    console.log('Starting model fine-tuning with DeepSeek...')
+    console.log('Starting model fine-tuning with OpenAI...')
     
     try {
       // Prepare fine-tuning data
       const fineTuneData = {
-        model: this.deepSeekConfig.model,
+        model: this.o3Config.model,
         training_file: await this.createTrainingFile(trainingExamples),
         hyperparameters: {
           n_epochs: 3,
@@ -123,13 +123,13 @@ Based on professional poker data, what is the optimal action in this situation?`
         }
       }
 
-      // Call DeepSeek fine-tuning API
+      // Call OpenAI fine-tuning API
       const response = await axios.post(
-        'https://api.deepseek.com/v1/fine_tuning/jobs',
+        'https://api.openai.com/v1/fine_tuning/jobs',
         fineTuneData,
         {
           headers: {
-            'Authorization': `Bearer ${this.deepSeekConfig.apiKey}`,
+            'Authorization': `Bearer ${this.o3Config.apiKey}`,
             'Content-Type': 'application/json'
           }
         }
@@ -155,7 +155,7 @@ Based on professional poker data, what is the optimal action in this situation?`
     
     fs.writeFileSync(trainingFile, fileContent)
     
-    // Upload to DeepSeek (this would be the actual implementation)
+    // Upload to OpenAI (this would be the actual implementation)
     console.log(`Created training file with ${trainingExamples.length} examples`)
     return trainingFile
   }
@@ -167,10 +167,10 @@ Based on professional poker data, what is the optimal action in this situation?`
     while (status === 'running') {
       try {
         const response = await axios.get(
-          `https://api.deepseek.com/v1/fine_tuning/jobs/${jobId}`,
+          `https://api.openai.com/v1/fine_tuning/jobs/${jobId}`,
           {
             headers: {
-              'Authorization': `Bearer ${this.deepSeekConfig.apiKey}`
+              'Authorization': `Bearer ${this.o3Config.apiKey}`
             }
           }
         )
@@ -225,7 +225,7 @@ Based on professional poker data, what is the optimal action in this situation?`
 
   async callFineTunedModel(modelId, prompt) {
     const response = await axios.post(
-      'https://api.deepseek.com/v1/chat/completions',
+      'https://api.openai.com/v1/chat/completions',
       {
         model: modelId,
         messages: [
@@ -243,7 +243,7 @@ Based on professional poker data, what is the optimal action in this situation?`
       },
       {
         headers: {
-          'Authorization': `Bearer ${this.deepSeekConfig.apiKey}`,
+          'Authorization': `Bearer ${this.o3Config.apiKey}`,
           'Content-Type': 'application/json'
         }
       }

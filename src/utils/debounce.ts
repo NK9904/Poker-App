@@ -9,8 +9,6 @@ export function debounce<T extends (...args: any[]) => any>(
   let timeoutId: number | undefined
 
   return function(this: any, ...args: Parameters<T>) {
-    const context = this
-
     // Clear the previous timeout if it exists
     if (timeoutId !== undefined) {
       clearTimeout(timeoutId)
@@ -18,7 +16,7 @@ export function debounce<T extends (...args: any[]) => any>(
 
     // Set a new timeout
     timeoutId = window.setTimeout(() => {
-      func.apply(context, args)
+      func.apply(this, args)
     }, delay)
   }
 }
@@ -36,17 +34,15 @@ export function throttle<T extends (...args: any[]) => any>(
   let lastRan: number
 
   return function(this: any, ...args: Parameters<T>) {
-    const context = this
-
     if (!inThrottle) {
-      func.apply(context, args)
+      func.apply(this, args)
       lastRan = Date.now()
       inThrottle = true
     } else {
       clearTimeout(lastFunc)
       lastFunc = window.setTimeout(() => {
         if (Date.now() - lastRan >= limit) {
-          func.apply(context, args)
+          func.apply(this, args)
           lastRan = Date.now()
         }
       }, limit - (Date.now() - lastRan))
@@ -64,11 +60,9 @@ export function rafThrottle<T extends (...args: any[]) => any>(
   let rafId: number | null = null
 
   return function(this: any, ...args: Parameters<T>) {
-    const context = this
-
     if (rafId === null) {
       rafId = requestAnimationFrame(() => {
-        func.apply(context, args)
+        func.apply(this, args)
         rafId = null
       })
     }
@@ -126,7 +120,9 @@ export class LRUCache<K, V> {
     } else if (this.cache.size >= this.maxSize) {
       // Remove least recently used item
       const firstKey = this.cache.keys().next().value
-      this.cache.delete(firstKey)
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey)
+      }
     }
     this.cache.set(key, value)
   }

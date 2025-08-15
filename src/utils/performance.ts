@@ -26,7 +26,7 @@ class PerformanceMonitor {
         })
         longTaskObserver.observe({ entryTypes: ['longtask'] })
         this.observers.push(longTaskObserver)
-      } catch (e) {
+      } catch {
         console.log('Long task observer not supported')
       }
 
@@ -41,7 +41,7 @@ class PerformanceMonitor {
         })
         clsObserver.observe({ entryTypes: ['layout-shift'] })
         this.observers.push(clsObserver)
-      } catch (e) {
+      } catch {
         console.log('Layout shift observer not supported')
       }
     }
@@ -186,7 +186,7 @@ export class FPSMonitor {
 }
 
 // Web Worker utility for heavy calculations
-export function createWorkerFromFunction(fn: Function) {
+export function createWorkerFromFunction(fn: (...args: unknown[]) => unknown) {
   const blob = new Blob(
     [`self.onmessage = function(e) { self.postMessage((${fn.toString()})(e.data)); }`],
     { type: 'application/javascript' }
@@ -199,7 +199,7 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): T {
-  let timeout: number | null = null
+  let timeout: ReturnType<typeof setTimeout> | null = null
   
   return ((...args: any[]) => {
     if (timeout) clearTimeout(timeout)

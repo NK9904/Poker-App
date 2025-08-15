@@ -1,4 +1,5 @@
-import type { Card, HandRank, HandEvaluation, EquityResult, GtoAction, GtoStrategy } from '../types/poker'
+import type { Card, HandEvaluation, EquityResult, GtoAction, GtoStrategy } from '../types/poker'
+import { HandRank } from '../types/poker'
 import { RANK_VALUES } from '../constants/poker'
 
 /**
@@ -81,7 +82,7 @@ export class PokerEngine {
       
       const blob = new Blob([workerCode], { type: 'application/javascript' })
       this.worker = new Worker(URL.createObjectURL(blob))
-    } catch (error) {
+    } catch {
       console.warn('Web Worker not available, falling back to main thread calculations')
     }
   }
@@ -280,16 +281,59 @@ export class PokerEngine {
     const actions: GtoAction[] = []
     
     if (handStrength < 0.3) {
-      actions.push({ action: 'fold', frequency: 0.7 })
-      actions.push({ action: 'call', frequency: 0.2 })
-      actions.push({ action: 'raise', frequency: 0.1, sizing: potSize * 0.5 })
+      actions.push({ 
+        action: 'fold', 
+        frequency: 0.7, 
+        expectedValue: -potSize * 0.1, 
+        reasoning: 'Weak hand strength suggests folding' 
+      })
+      actions.push({ 
+        action: 'call', 
+        frequency: 0.2, 
+        expectedValue: handStrength * potSize - (1 - handStrength) * stackSize * 0.1, 
+        reasoning: 'Moderate hand strength suggests calling' 
+      })
+      actions.push({ 
+        action: 'raise', 
+        frequency: 0.1, 
+        sizing: potSize * 0.5, 
+        expectedValue: handStrength * potSize * 1.5, 
+        reasoning: 'Strong hand strength suggests raising' 
+      })
     } else if (handStrength < 0.7) {
-      actions.push({ action: 'fold', frequency: 0.1 })
-      actions.push({ action: 'call', frequency: 0.6 })
-      actions.push({ action: 'raise', frequency: 0.3, sizing: potSize * 0.75 })
+      actions.push({ 
+        action: 'fold', 
+        frequency: 0.1, 
+        expectedValue: -potSize * 0.1, 
+        reasoning: 'Weak hand strength suggests folding' 
+      })
+      actions.push({ 
+        action: 'call', 
+        frequency: 0.6, 
+        expectedValue: handStrength * potSize - (1 - handStrength) * stackSize * 0.1, 
+        reasoning: 'Moderate hand strength suggests calling' 
+      })
+      actions.push({ 
+        action: 'raise', 
+        frequency: 0.3, 
+        sizing: potSize * 0.75, 
+        expectedValue: handStrength * potSize * 1.5, 
+        reasoning: 'Strong hand strength suggests raising' 
+      })
     } else {
-      actions.push({ action: 'call', frequency: 0.2 })
-      actions.push({ action: 'raise', frequency: 0.8, sizing: potSize * 1.0 })
+      actions.push({ 
+        action: 'call', 
+        frequency: 0.2, 
+        expectedValue: handStrength * potSize - (1 - handStrength) * stackSize * 0.1, 
+        reasoning: 'Moderate hand strength suggests calling' 
+      })
+      actions.push({ 
+        action: 'raise', 
+        frequency: 0.8, 
+        sizing: potSize * 1.0, 
+        expectedValue: handStrength * potSize * 1.5, 
+        reasoning: 'Strong hand strength suggests raising' 
+      })
     }
     
     return {
@@ -302,7 +346,7 @@ export class PokerEngine {
   /**
    * Generate optimal betting ranges based on position and board texture
    */
-  generateOptimalRanges(position: string, boardTexture: string): string[] {
+  generateOptimalRanges(position: string, _boardTexture: string): string[] {
     const ranges = {
       earlyPosition: [
         'AA', 'KK', 'QQ', 'JJ', 'TT', '99', 'AKs', 'AQs', 'AJs', 'ATs',

@@ -69,6 +69,7 @@ export interface PokerAction {
   expectedValue?: number
   reasoning?: string
   confidence?: number
+  frequency?: number
 }
 
 export interface AnalysisResult {
@@ -88,7 +89,7 @@ export interface AdvancedAnalysis {
   aiAnalysis?: AnalysisResult
 }
 
-export interface DeepSeekConfig {
+export interface O3Config {
   apiKey: string
   model: string
   maxTokens: number

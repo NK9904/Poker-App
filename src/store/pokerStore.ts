@@ -5,11 +5,10 @@ import type {
   HandRange, 
   AdvancedAnalysis, 
   GameContext,
-  AnalysisResult,
   ModelMetrics
 } from '../types/poker'
-import { pokerEngine, calculateHandStrength, getHandDescription } from '../utils/pokerEngine'
-import { DeepSeekPokerAI } from '../ai/DeepSeekPokerAI'
+import { pokerEngine } from '../utils/pokerEngine'
+import { O3PokerAI } from '../ai/O3PokerAI'
 
 interface PokerState {
   // Current hand
@@ -31,7 +30,7 @@ interface PokerState {
   gameContext: GameContext
   
   // AI model state
-  aiModel: DeepSeekPokerAI | null
+  aiModel: O3PokerAI | null
   modelMetrics: ModelMetrics | null
   isAIAvailable: boolean
   
@@ -207,25 +206,25 @@ export const usePokerStore = create<PokerState>()(
     initializeAI: async () => {
       try {
         const config = {
-          apiKey: process.env.VITE_DEEPSEEK_API_KEY || '',
-          model: 'deepseek-chat',
+          apiKey: import.meta.env.VITE_OPENAI_API_KEY || '',
+          model: 'gpt-4o',
           maxTokens: 4000,
           temperature: 0.1
         }
         
         if (!config.apiKey) {
-          console.warn('DeepSeek API key not found, AI features will be disabled')
+          console.warn('OpenAI API key not found, AI features will be disabled')
           set({ isAIAvailable: false })
           return
         }
         
-        const aiModel = new DeepSeekPokerAI(config)
+        const aiModel = new O3PokerAI(config)
         set({ 
           aiModel,
           isAIAvailable: true
         })
         
-        console.log('AI model initialized successfully')
+        console.log('O3 AI model initialized successfully')
         
       } catch (error) {
         console.error('Failed to initialize AI model:', error)

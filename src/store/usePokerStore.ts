@@ -1,12 +1,7 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { pokerEngine, calculateHandStrength, getHandDescription } from '../utils/pokerEngine'
-import type { EquityResult, GtoStrategy, HandEvaluation } from '../utils/pokerEngine'
-
-export interface Card {
-  suit: 'hearts' | 'diamonds' | 'clubs' | 'spades'
-  rank: 'A' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'T' | 'J' | 'Q' | 'K'
-}
+import type { Card, EquityResult, GtoStrategy, HandEvaluation } from '../types/poker'
 
 export interface HandRange {
   combinations: string[]

@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState, useMemo, useEffect } from 'react'
+import { memo, useCallback, useState, useMemo, useEffect } from 'react'
 import { usePokerStore } from '../store/pokerStore'
 import {
   usePlayerCards,
@@ -7,7 +7,6 @@ import {
   useEquity,
   useHandDescription,
   useAnalysis,
-  useGtoStrategy,
   useGameContext,
   useAIAvailable,
   useModelMetrics
@@ -17,9 +16,9 @@ import { CardDisplay } from '../components/ui/CardDisplay'
 import { MetricDisplay } from '../components/ui/MetricDisplay'
 import { CardSelector } from '../components/poker/CardSelector'
 import { GameContextControls } from '../components/poker/GameContextControls'
-import { AnalysisResults } from '../components/poker/AnalysisResults'
+import AnalysisResults from '../components/poker/AnalysisResults'
 import { CardUtils } from '../utils/cardUtils'
-import type { Card } from '../types/poker'
+
 
 const PokerSolver = memo(() => {
   const [calculationTime, setCalculationTime] = useState<number>(0)
@@ -117,7 +116,7 @@ const PokerSolver = memo(() => {
           borderRadius: '0.5rem',
           marginBottom: '1rem'
         }}>
-          ⚠️ AI features disabled - DeepSeek API key not configured
+          ⚠️ AI features disabled - OpenAI API key not configured
         </div>
       )
     }
@@ -134,7 +133,7 @@ const PokerSolver = memo(() => {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <span>🤖 DeepSeek AI Active (v{modelMetrics.version})</span>
+          <span>🤖 O3 AI Active (v{modelMetrics.version})</span>
           <button 
             onClick={clearAICache}
             style={{ 
@@ -172,7 +171,7 @@ const PokerSolver = memo(() => {
           AI Poker Solver
         </h1>
         <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.125rem' }}>
-          Advanced GTO solver powered by DeepSeek AI trained on professional poker data
+          Advanced GTO solver powered by O3 AI trained on professional poker data
         </p>
       </div>
 

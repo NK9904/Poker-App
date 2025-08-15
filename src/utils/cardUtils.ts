@@ -1,5 +1,5 @@
 import type { Card } from '../types/poker'
-import { RANK_VALUES, SUIT_SYMBOLS, SUIT_COLORS, CARD_RANKS, CARD_SUITS } from '../constants/poker'
+import { SUIT_SYMBOLS, SUIT_COLORS, CARD_RANKS, CARD_SUITS } from '../constants/poker'
 
 /**
  * Utility functions for card operations
@@ -25,7 +25,6 @@ export class CardUtils {
     if (!cardString || cardString.length !== 2) return null
     
     const [rank, suit] = cardString.split('')
-    const suitMap = { h: 'hearts', d: 'diamonds', c: 'clubs', s: 'spades' } as const
     
     if (!CARD_RANKS.includes(rank as any) || !CARD_SUITS.includes(suit as any)) {
       return null
@@ -33,7 +32,7 @@ export class CardUtils {
     
     return {
       rank: rank as Card['rank'],
-      suit: suitMap[suit as keyof typeof suitMap]
+      suit: suit as Card['suit']
     }
   }
 
@@ -41,8 +40,7 @@ export class CardUtils {
    * Convert Card object to string
    */
   static cardToString(card: Card): string {
-    const suitMap = { hearts: 'h', diamonds: 'd', clubs: 'c', spades: 's' } as const
-    return `${card.rank}${suitMap[card.suit]}`
+    return `${card.rank}${card.suit}`
   }
 
   /**

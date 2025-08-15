@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react'
+import { Component, ErrorInfo, ReactNode } from 'react'
 
 interface Props {
   children: ReactNode
@@ -28,7 +28,7 @@ export class ErrorBoundary extends Component<Props, State> {
     }
     
     // In production, send to error reporting service
-    if (process.env.NODE_ENV === 'production') {
+    if (import.meta.env.PROD) {
       // Send to analytics/error reporting
       try {
         // Example: Send to analytics service
