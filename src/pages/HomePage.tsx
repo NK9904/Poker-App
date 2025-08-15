@@ -29,25 +29,25 @@ const HomePage: React.FC = () => {
       icon: Brain,
       title: 'AI-Powered Analysis',
       description: 'Advanced GTO solver using open-source AI models for optimal poker strategy',
-      color: 'from-blue-600 to-purple-600'
+      color: 'from-red-600 to-red-800'
     },
     {
       icon: Bot,
       title: '3D AI Assistant',
       description: 'Immersive 3D interface with real-time poker move suggestions',
-      color: 'from-green-600 to-teal-600'
+      color: 'from-gray-700 to-black'
     },
     {
       icon: Target,
       title: 'Range Calculator',
       description: 'Professional-grade range analysis with GTO principles',
-      color: 'from-orange-600 to-red-600'
+      color: 'from-red-700 to-red-900'
     },
     {
       icon: BarChart3,
       title: 'Hand Analyzer',
       description: 'Detailed hand breakdown with equity calculations',
-      color: 'from-purple-600 to-pink-600'
+      color: 'from-gray-800 to-gray-900'
     }
   ]
 

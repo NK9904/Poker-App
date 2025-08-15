@@ -1,11 +1,11 @@
-import React from 'react'
+import { memo } from 'react'
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }
 
-export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
+export const LoadingSpinner = memo<LoadingSpinnerProps>(({ 
   size = 'md', 
   className = '' 
 }) => {
@@ -18,12 +18,12 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   return (
     <div className={`flex justify-center items-center p-8 ${className}`}>
       <div 
-        className={`loading ${sizeClasses[size]}`}
-        style={{
-          width: size === 'sm' ? '24px' : size === 'lg' ? '64px' : '40px',
-          height: size === 'sm' ? '24px' : size === 'lg' ? '64px' : '40px'
-        }}
+        className={`loading-spinner ${sizeClasses[size]}`}
+        aria-label="Loading"
+        role="status"
       />
     </div>
   )
-}
+})
+
+LoadingSpinner.displayName = 'LoadingSpinner'

@@ -10,6 +10,7 @@ import type {
 } from '../types/poker'
 import { pokerEngine } from '../utils/pokerEngine'
 import { OpenSourcePokerAI } from '../ai/OpenSourcePokerAI'
+import { logger } from '../utils/logger'
 
 interface PokerState {
   // Current hand
@@ -138,7 +139,7 @@ export const usePokerStore = create<PokerState>()(
           }
         })
       } catch (error) {
-        console.error('Error evaluating hand:', error)
+        logger.error('Error evaluating hand:', error)
       }
     },
     
@@ -170,7 +171,7 @@ export const usePokerStore = create<PokerState>()(
           lastCalculation: new Date()
         })
       } catch (error) {
-        console.error('Error running full analysis:', error)
+        logger.error('Error running full analysis:', error)
       } finally {
         set({ isLoading: false })
       }
@@ -210,7 +211,7 @@ export const usePokerStore = create<PokerState>()(
         })
         
       } catch (error) {
-        console.error('Error running AI analysis:', error)
+        logger.error('Error running AI analysis:', error)
       } finally {
         set({ isLoading: false })
       }
@@ -236,13 +237,13 @@ export const usePokerStore = create<PokerState>()(
         })
         
         if (isAvailable) {
-          console.log('Open-source AI model initialized successfully')
+          logger.log('Open-source AI model initialized successfully')
         } else {
-          console.log('Open-source AI model initialized with local fallback')
+          logger.log('Open-source AI model initialized with local fallback')
         }
         
       } catch (error) {
-        console.error('Failed to initialize AI model:', error)
+        logger.error('Failed to initialize AI model:', error)
         set({ isAIAvailable: false })
       }
     },
@@ -256,7 +257,7 @@ export const usePokerStore = create<PokerState>()(
       const state = get()
       if (state.aiModel) {
         state.aiModel.clearCache()
-        console.log('AI cache cleared')
+        logger.log('AI cache cleared')
       }
     },
 
