@@ -1,41 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/poker-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+
     <!-- Performance optimizations -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="//fonts.googleapis.com">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+
     <!-- Critical CSS for fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Meta tags for PWA -->
     <meta name="theme-color" content="#1f2937" />
-    <meta name="description" content="AI-powered poker solver with advanced performance optimization" />
-    
+    <meta
+      name="description"
+      content="AI-powered poker solver with advanced performance optimization"
+    />
+
     <!-- Preload critical resources -->
-    <link rel="modulepreload" href="/src/main.tsx">
-    
+    <link rel="modulepreload" href="/src/main.tsx" />
+
     <title>Poker AI Solver</title>
-    
+
     <style>
       /* Critical CSS - inline for fastest rendering */
       * {
         box-sizing: border-box;
       }
-      
+
       body {
         margin: 0;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          'Roboto',
+          sans-serif;
         background-color: #111827;
         color: #f9fafb;
         font-display: swap;
       }
-      
+
       /* Loading spinner */
       .loading {
         position: fixed;
@@ -49,12 +61,16 @@
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
-      
+
       @keyframes spin {
-        0% { transform: translate(-50%, -50%) rotate(0deg); }
-        100% { transform: translate(-50%, -50%) rotate(360deg); }
+        0% {
+          transform: translate(-50%, -50%) rotate(0deg);
+        }
+        100% {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
       }
-      
+
       #root {
         min-height: 100vh;
       }

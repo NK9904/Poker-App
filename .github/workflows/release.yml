@@ -12,28 +12,28 @@ jobs:
   release:
     runs-on: ubuntu-latest
     name: Create Release
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Build application
         run: npm run build
-        
+
       - name: Run tests
         run: npm test --if-present
-        
+
       - name: Update Release
         uses: release-drafter/release-drafter@v5
         with:
@@ -43,7 +43,7 @@ jobs:
           tag: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
         with:
@@ -53,12 +53,12 @@ jobs:
           asset_content_type: application/zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Create Release Archive
         run: |
           cd dist
           zip -r ../poker-app-${{ github.ref_name }}.zip .
-          
+
       - name: Upload Release Archive
         uses: actions/upload-release-asset@v1
         with:
@@ -74,7 +74,7 @@ jobs:
     name: Notify Release
     needs: release
     if: always()
-    
+
     steps:
       - name: Notify Discord (if configured)
         uses: sarisia/actions-status-discord@v1
@@ -85,11 +85,11 @@ jobs:
           title: Release ${{ github.ref_name }}
           description: |
             A new release has been published!
-            
+
             **Version**: ${{ github.ref_name }}
             **Repository**: ${{ github.repository }}
             **Release URL**: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}
-            
+
       - name: Notify Slack (if configured)
         uses: 8398a7/action-slack@v3
         if: ${{ secrets.SLACK_WEBHOOK }}
@@ -98,7 +98,7 @@ jobs:
           webhook_url: ${{ secrets.SLACK_WEBHOOK }}
           text: |
             🎉 New Release Published!
-            
+
             **Version**: ${{ github.ref_name }}
             **Repository**: ${{ github.repository }}
             **Release URL**: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}

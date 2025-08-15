@@ -1,38 +1,137 @@
 // Poker game constants
 export const RANK_VALUES: Record<string, number> = {
-  '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'T': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14
-}
+  '2': 2,
+  '3': 3,
+  '4': 4,
+  '5': 5,
+  '6': 6,
+  '7': 7,
+  '8': 8,
+  '9': 9,
+  T: 10,
+  J: 11,
+  Q: 12,
+  K: 13,
+  A: 14,
+};
 
 export const SUIT_SYMBOLS = {
   h: '♥️',
   d: '♦️',
   c: '♣️',
-  s: '♠️'
-} as const
+  s: '♠️',
+} as const;
 
 export const SUIT_COLORS = {
   h: '#ef4444',
   d: '#ef4444',
   c: '#000000',
-  s: '#000000'
-} as const
+  s: '#000000',
+} as const;
 
-export const CARD_RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'] as const
-export const CARD_SUITS = ['h', 'd', 'c', 's'] as const
+export const CARD_RANKS = [
+  'A',
+  'K',
+  'Q',
+  'J',
+  'T',
+  '9',
+  '8',
+  '7',
+  '6',
+  '5',
+  '4',
+  '3',
+  '2',
+] as const;
+export const CARD_SUITS = ['h', 'd', 'c', 's'] as const;
 
 export const POSITION_RANGES = {
   early: [
-    'AA', 'KK', 'QQ', 'JJ', 'TT', '99', 'AKs', 'AQs', 'AJs', 'ATs',
-    'AKo', 'KQs', 'KJs', 'QJs', 'JTs'
+    'AA',
+    'KK',
+    'QQ',
+    'JJ',
+    'TT',
+    '99',
+    'AKs',
+    'AQs',
+    'AJs',
+    'ATs',
+    'AKo',
+    'KQs',
+    'KJs',
+    'QJs',
+    'JTs',
   ],
   middle: [
-    'AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', 'AKs', 'AQs', 'AJs', 'ATs', 'A9s',
-    'AKo', 'AQo', 'KQs', 'KJs', 'KTs', 'QJs', 'QTs', 'JTs', 'T9s'
+    'AA',
+    'KK',
+    'QQ',
+    'JJ',
+    'TT',
+    '99',
+    '88',
+    '77',
+    'AKs',
+    'AQs',
+    'AJs',
+    'ATs',
+    'A9s',
+    'AKo',
+    'AQo',
+    'KQs',
+    'KJs',
+    'KTs',
+    'QJs',
+    'QTs',
+    'JTs',
+    'T9s',
   ],
   late: [
-    'AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
-    'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
-    'AKo', 'AQo', 'AJo', 'ATo', 'KQs', 'KJs', 'KTs', 'K9s', 'QJs', 'QTs', 'Q9s',
-    'JTs', 'J9s', 'T9s', 'T8s', '98s', '87s', '76s', '65s'
-  ]
-} as const
+    'AA',
+    'KK',
+    'QQ',
+    'JJ',
+    'TT',
+    '99',
+    '88',
+    '77',
+    '66',
+    '55',
+    '44',
+    '33',
+    '22',
+    'AKs',
+    'AQs',
+    'AJs',
+    'ATs',
+    'A9s',
+    'A8s',
+    'A7s',
+    'A6s',
+    'A5s',
+    'A4s',
+    'A3s',
+    'A2s',
+    'AKo',
+    'AQo',
+    'AJo',
+    'ATo',
+    'KQs',
+    'KJs',
+    'KTs',
+    'K9s',
+    'QJs',
+    'QTs',
+    'Q9s',
+    'JTs',
+    'J9s',
+    'T9s',
+    'T8s',
+    '98s',
+    '87s',
+    '76s',
+    '65s',
+  ],
+} as const;

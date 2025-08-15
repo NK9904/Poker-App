@@ -3,128 +3,128 @@
 
 # Priority Labels
 priority-high:
-  - name: "priority: high"
-    color: "d73a4a"
-    description: "High priority issue or feature"
+  - name: 'priority: high'
+    color: 'd73a4a'
+    description: 'High priority issue or feature'
 priority-medium:
-  - name: "priority: medium"
-    color: "fbca04"
-    description: "Medium priority issue or feature"
+  - name: 'priority: medium'
+    color: 'fbca04'
+    description: 'Medium priority issue or feature'
 priority-low:
-  - name: "priority: low"
-    color: "0e8a16"
-    description: "Low priority issue or feature"
+  - name: 'priority: low'
+    color: '0e8a16'
+    description: 'Low priority issue or feature'
 
 # Type Labels
 type-bug:
-  - name: "type: bug"
-    color: "d73a4a"
+  - name: 'type: bug'
+    color: 'd73a4a'
     description: "Something isn't working"
 type-enhancement:
-  - name: "type: enhancement"
-    color: "a2eeef"
-    description: "New feature or request"
+  - name: 'type: enhancement'
+    color: 'a2eeef'
+    description: 'New feature or request'
 type-documentation:
-  - name: "type: documentation"
-    color: "0075ca"
-    description: "Improvements or additions to documentation"
+  - name: 'type: documentation'
+    color: '0075ca'
+    description: 'Improvements or additions to documentation'
 type-performance:
-  - name: "type: performance"
-    color: "ff8c00"
-    description: "Performance improvements or issues"
+  - name: 'type: performance'
+    color: 'ff8c00'
+    description: 'Performance improvements or issues'
 type-security:
-  - name: "type: security"
-    color: "ff0000"
-    description: "Security vulnerability or improvement"
+  - name: 'type: security'
+    color: 'ff0000'
+    description: 'Security vulnerability or improvement'
 type-testing:
-  - name: "type: testing"
-    color: "c2e0c6"
-    description: "Testing related changes"
+  - name: 'type: testing'
+    color: 'c2e0c6'
+    description: 'Testing related changes'
 
 # Status Labels
 status-needs-triage:
-  - name: "status: needs triage"
-    color: "d93f0b"
-    description: "Issue needs initial review"
+  - name: 'status: needs triage'
+    color: 'd93f0b'
+    description: 'Issue needs initial review'
 status-in-progress:
-  - name: "status: in progress"
-    color: "0e8a16"
-    description: "Work is in progress"
+  - name: 'status: in progress'
+    color: '0e8a16'
+    description: 'Work is in progress'
 status-blocked:
-  - name: "status: blocked"
-    color: "d93f0b"
-    description: "Blocked by another issue or dependency"
+  - name: 'status: blocked'
+    color: 'd93f0b'
+    description: 'Blocked by another issue or dependency'
 status-ready-for-review:
-  - name: "status: ready for review"
-    color: "fbca04"
-    description: "Ready for code review"
+  - name: 'status: ready for review'
+    color: 'fbca04'
+    description: 'Ready for code review'
 status-approved:
-  - name: "status: approved"
-    color: "0e8a16"
-    description: "Approved for merge"
+  - name: 'status: approved'
+    color: '0e8a16'
+    description: 'Approved for merge'
 
 # Component Labels
 component-ui:
-  - name: "component: ui"
-    color: "d4c5f9"
-    description: "User interface components"
+  - name: 'component: ui'
+    color: 'd4c5f9'
+    description: 'User interface components'
 component-poker:
-  - name: "component: poker"
-    color: "d4c5f9"
-    description: "Poker engine and logic"
+  - name: 'component: poker'
+    color: 'd4c5f9'
+    description: 'Poker engine and logic'
 component-performance:
-  - name: "component: performance"
-    color: "d4c5f9"
-    description: "Performance optimizations"
+  - name: 'component: performance'
+    color: 'd4c5f9'
+    description: 'Performance optimizations'
 component-build:
-  - name: "component: build"
-    color: "d4c5f9"
-    description: "Build system and configuration"
+  - name: 'component: build'
+    color: 'd4c5f9'
+    description: 'Build system and configuration'
 component-docs:
-  - name: "component: docs"
-    color: "d4c5f9"
-    description: "Documentation"
+  - name: 'component: docs'
+    color: 'd4c5f9'
+    description: 'Documentation'
 
 # Special Labels
 good-first-issue:
-  - name: "good first issue"
-    color: "7057ff"
-    description: "Good for newcomers"
+  - name: 'good first issue'
+    color: '7057ff'
+    description: 'Good for newcomers'
 help-wanted:
-  - name: "help wanted"
-    color: "008672"
-    description: "Extra attention is needed"
+  - name: 'help wanted'
+    color: '008672'
+    description: 'Extra attention is needed'
 wontfix:
-  - name: "wontfix"
-    color: "ffffff"
-    description: "This will not be worked on"
+  - name: 'wontfix'
+    color: 'ffffff'
+    description: 'This will not be worked on'
 duplicate:
-  - name: "duplicate"
-    color: "cfd3d7"
-    description: "This issue or pull request already exists"
+  - name: 'duplicate'
+    color: 'cfd3d7'
+    description: 'This issue or pull request already exists'
 invalid:
-  - name: "invalid"
-    color: "e4e669"
-    description: "Something is wrong"
+  - name: 'invalid'
+    color: 'e4e669'
+    description: 'Something is wrong'
 question:
-  - name: "question"
-    color: "d876e3"
-    description: "Further information is requested"
+  - name: 'question'
+    color: 'd876e3'
+    description: 'Further information is requested'
 
 # Automated Labels
 dependencies:
-  - name: "dependencies"
-    color: "0366d6"
-    description: "Pull requests that update a dependency file"
+  - name: 'dependencies'
+    color: '0366d6'
+    description: 'Pull requests that update a dependency file'
 automated:
-  - name: "automated"
-    color: "1d76db"
-    description: "Automated changes"
+  - name: 'automated'
+    color: '1d76db'
+    description: 'Automated changes'
 github-actions:
-  - name: "github-actions"
-    color: "1d76db"
-    description: "GitHub Actions related changes"
+  - name: 'github-actions'
+    color: '1d76db'
+    description: 'GitHub Actions related changes'
 docker:
-  - name: "docker"
-    color: "2496ed"
-    description: "Docker related changes"
+  - name: 'docker'
+    color: '2496ed'
+    description: 'Docker related changes'

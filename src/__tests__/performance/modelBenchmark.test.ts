@@ -22,7 +22,7 @@ describe('Model Performance Benchmarks', () => {
     ollamaUrl: 'http://localhost:11434',
     model: 'llama2',
     maxTokens: 1000,
-    temperature: 0.7
+    temperature: 0.7,
   };
 
   beforeAll(() => {
@@ -40,7 +40,7 @@ describe('Model Performance Benchmarks', () => {
     testFn: () => Promise<void>
   ): Promise<BenchmarkResult> => {
     const times: number[] = [];
-    
+
     // Warm-up runs
     for (let i = 0; i < 5; i++) {
       await testFn();
@@ -55,7 +55,7 @@ describe('Model Performance Benchmarks', () => {
     }
 
     times.sort((a, b) => a - b);
-    
+
     return {
       name,
       iterations,
@@ -65,7 +65,7 @@ describe('Model Performance Benchmarks', () => {
       maxTime: times[times.length - 1],
       p50: times[Math.floor(times.length * 0.5)],
       p95: times[Math.floor(times.length * 0.95)],
-      p99: times[Math.floor(times.length * 0.99)]
+      p99: times[Math.floor(times.length * 0.99)],
     };
   };
 
@@ -89,7 +89,7 @@ P99: ${result.p99.toFixed(2)}ms
     it('should benchmark simple hand evaluation', async () => {
       const playerCards: Card[] = [
         { rank: 'A', suit: 'h' },
-        { rank: 'K', suit: 'h' }
+        { rank: 'K', suit: 'h' },
       ];
 
       const gameContext: GameContext = {
@@ -97,7 +97,7 @@ P99: ${result.p99.toFixed(2)}ms
         stackSize: 1000,
         position: 'late',
         street: 'preflop',
-                actionHistory: []
+        actionHistory: [],
       };
 
       const result = await runBenchmark(
@@ -109,7 +109,7 @@ P99: ${result.p99.toFixed(2)}ms
       );
 
       logBenchmarkResult(result);
-      
+
       expect(result.avgTime).toBeLessThan(50); // Should average < 50ms
       expect(result.p95).toBeLessThan(100); // 95th percentile < 100ms
     });
@@ -117,13 +117,13 @@ P99: ${result.p99.toFixed(2)}ms
     it('should benchmark complex board evaluation', async () => {
       const playerCards: Card[] = [
         { rank: 'Q', suit: 'h' },
-        { rank: 'J', suit: 'h' }
+        { rank: 'J', suit: 'h' },
       ];
 
       const boardCards: Card[] = [
         { rank: 'T', suit: 'h' },
         { rank: '9', suit: 'h' },
-        { rank: '8', suit: 'c' }
+        { rank: '8', suit: 'c' },
       ];
 
       const gameContext: GameContext = {
@@ -131,7 +131,7 @@ P99: ${result.p99.toFixed(2)}ms
         stackSize: 1500,
         position: 'middle',
         street: 'turn',
-                actionHistory: []
+        actionHistory: [],
       };
 
       const result = await runBenchmark(
@@ -145,7 +145,7 @@ P99: ${result.p99.toFixed(2)}ms
       );
 
       logBenchmarkResult(result);
-      
+
       expect(result.avgTime).toBeLessThan(100); // Should average < 100ms
       expect(result.p95).toBeLessThan(200); // 95th percentile < 200ms
     });
@@ -156,15 +156,21 @@ P99: ${result.p99.toFixed(2)}ms
       const scenarios = Array.from({ length: 20 }, (_, i) => ({
         playerCards: [
           { rank: ['A', 'K', 'Q', 'J'][i % 4] as Rank, suit: 'h' as Suit },
-          { rank: ['A', 'K', 'Q', 'J'][(i + 1) % 4] as Rank, suit: 'c' as Suit }
+          {
+            rank: ['A', 'K', 'Q', 'J'][(i + 1) % 4] as Rank,
+            suit: 'c' as Suit,
+          },
         ] as Card[],
         gameContext: {
           potSize: 100 + i * 10,
           stackSize: 1000,
-          position: ['early', 'middle', 'late'][i % 3] as 'early' | 'middle' | 'late',
+          position: ['early', 'middle', 'late'][i % 3] as
+            | 'early'
+            | 'middle'
+            | 'late',
           street: 'preflop' as const,
-                    actionHistory: []
-        }
+          actionHistory: [],
+        },
       }));
 
       const result = await runBenchmark(
@@ -172,7 +178,7 @@ P99: ${result.p99.toFixed(2)}ms
         50,
         async () => {
           await Promise.all(
-            scenarios.map(s => 
+            scenarios.map(s =>
               ai.getOptimalAction(s.playerCards, [], s.gameContext)
             )
           );
@@ -180,7 +186,7 @@ P99: ${result.p99.toFixed(2)}ms
       );
 
       logBenchmarkResult(result);
-      
+
       const avgPerHand = result.avgTime / scenarios.length;
       expect(avgPerHand).toBeLessThan(10); // < 10ms per hand when parallel
     });
@@ -189,15 +195,21 @@ P99: ${result.p99.toFixed(2)}ms
       const scenarios = Array.from({ length: 10 }, (_, i) => ({
         playerCards: [
           { rank: ['A', 'K', 'Q', 'J'][i % 4] as Rank, suit: 'h' as Suit },
-          { rank: ['A', 'K', 'Q', 'J'][(i + 1) % 4] as Rank, suit: 'c' as Suit }
+          {
+            rank: ['A', 'K', 'Q', 'J'][(i + 1) % 4] as Rank,
+            suit: 'c' as Suit,
+          },
         ] as Card[],
         gameContext: {
           potSize: 100 + i * 10,
           stackSize: 1000,
-          position: ['early', 'middle', 'late'][i % 3] as 'early' | 'middle' | 'late',
+          position: ['early', 'middle', 'late'][i % 3] as
+            | 'early'
+            | 'middle'
+            | 'late',
           street: 'preflop' as const,
-                    actionHistory: []
-        }
+          actionHistory: [],
+        },
       }));
 
       const result = await runBenchmark(
@@ -205,13 +217,17 @@ P99: ${result.p99.toFixed(2)}ms
         50,
         async () => {
           for (const scenario of scenarios) {
-            await ai.getOptimalAction(scenario.playerCards, [], scenario.gameContext);
+            await ai.getOptimalAction(
+              scenario.playerCards,
+              [],
+              scenario.gameContext
+            );
           }
         }
       );
 
       logBenchmarkResult(result);
-      
+
       const avgPerHand = result.avgTime / scenarios.length;
       expect(avgPerHand).toBeLessThan(20); // < 20ms per hand sequential
     });
@@ -221,7 +237,7 @@ P99: ${result.p99.toFixed(2)}ms
     it('should benchmark cache hit performance', async () => {
       const playerCards: Card[] = [
         { rank: 'K', suit: 'h' },
-        { rank: 'K', suit: 'c' }
+        { rank: 'K', suit: 'c' },
       ];
 
       const gameContext: GameContext = {
@@ -229,7 +245,7 @@ P99: ${result.p99.toFixed(2)}ms
         stackSize: 800,
         position: 'late',
         street: 'flop',
-                actionHistory: []
+        actionHistory: [],
       };
 
       // Prime the cache
@@ -244,7 +260,7 @@ P99: ${result.p99.toFixed(2)}ms
       );
 
       logBenchmarkResult(result);
-      
+
       expect(result.avgTime).toBeLessThan(1); // Cache hits should be < 1ms
       expect(result.p99).toBeLessThan(5); // Even 99th percentile < 5ms
     });
@@ -258,7 +274,7 @@ P99: ${result.p99.toFixed(2)}ms
           const uniqueValue = Math.random();
           const playerCards: Card[] = [
             { rank: 'A', suit: 'h' },
-            { rank: 'K', suit: 'c' }
+            { rank: 'K', suit: 'c' },
           ];
 
           const gameContext: GameContext = {
@@ -266,7 +282,7 @@ P99: ${result.p99.toFixed(2)}ms
             stackSize: 1000,
             position: 'middle',
             street: 'preflop',
-                        actionHistory: []
+            actionHistory: [],
           };
 
           ai.clearCache(); // Force cache miss
@@ -275,7 +291,7 @@ P99: ${result.p99.toFixed(2)}ms
       );
 
       logBenchmarkResult(result);
-      
+
       expect(result.avgTime).toBeLessThan(50); // Cache misses < 50ms
     });
   });
@@ -283,20 +299,31 @@ P99: ${result.p99.toFixed(2)}ms
   describe('Memory Usage', () => {
     it('should not leak memory with large cache', async () => {
       const initialMemory = process.memoryUsage().heapUsed;
-      
+
       // Generate many unique scenarios
       for (let i = 0; i < 1000; i++) {
         const playerCards: Card[] = [
-          { rank: (((i % 13) + 2) === 10 ? 'T' : String((i % 13) + 2)) as Rank, suit: 'h' as Suit },
-          { rank: ((((i + 1) % 13) + 2) === 10 ? 'T' : String(((i + 1) % 13) + 2)) as Rank, suit: 'c' as Suit }
+          {
+            rank: ((i % 13) + 2 === 10 ? 'T' : String((i % 13) + 2)) as Rank,
+            suit: 'h' as Suit,
+          },
+          {
+            rank: (((i + 1) % 13) + 2 === 10
+              ? 'T'
+              : String(((i + 1) % 13) + 2)) as Rank,
+            suit: 'c' as Suit,
+          },
         ];
 
         const gameContext: GameContext = {
           potSize: 100 + i,
           stackSize: 1000 - i,
-          position: ['early', 'middle', 'late'][i % 3] as 'early' | 'middle' | 'late',
+          position: ['early', 'middle', 'late'][i % 3] as
+            | 'early'
+            | 'middle'
+            | 'late',
           street: 'preflop',
-                    actionHistory: []
+          actionHistory: [],
         };
 
         await ai.analyzeSituation(playerCards, [], gameContext);
@@ -331,34 +358,43 @@ Final increase: ${memoryAfterClear.toFixed(2)} MB
   describe('Stress Testing', () => {
     it('should handle rapid concurrent requests', async () => {
       const concurrentRequests = 100;
-      
+
       const result = await runBenchmark(
         `Stress Test (${concurrentRequests} concurrent)`,
         10,
         async () => {
-          const promises = Array.from({ length: concurrentRequests }, (_, i) => {
-            const playerCards: Card[] = [
-              { rank: ['A', 'K', 'Q', 'J'][i % 4] as Rank, suit: 'h' as Suit },
-              { rank: ['A', 'K', 'Q', 'J'][(i + 1) % 4] as Rank, suit: 'c' as Suit }
-            ];
+          const promises = Array.from(
+            { length: concurrentRequests },
+            (_, i) => {
+              const playerCards: Card[] = [
+                {
+                  rank: ['A', 'K', 'Q', 'J'][i % 4] as Rank,
+                  suit: 'h' as Suit,
+                },
+                {
+                  rank: ['A', 'K', 'Q', 'J'][(i + 1) % 4] as Rank,
+                  suit: 'c' as Suit,
+                },
+              ];
 
-            const gameContext: GameContext = {
-              potSize: 100 + i,
-              stackSize: 1000,
-              position: 'middle',
-              street: 'preflop',
-                            actionHistory: []
-            };
+              const gameContext: GameContext = {
+                potSize: 100 + i,
+                stackSize: 1000,
+                position: 'middle',
+                street: 'preflop',
+                actionHistory: [],
+              };
 
-            return ai.getOptimalAction(playerCards, [], gameContext);
-          });
+              return ai.getOptimalAction(playerCards, [], gameContext);
+            }
+          );
 
           await Promise.all(promises);
         }
       );
 
       logBenchmarkResult(result);
-      
+
       expect(result.avgTime).toBeLessThan(1000); // Should complete 100 requests < 1s
       expect(result.p99).toBeLessThan(2000); // 99th percentile < 2s
     });
@@ -369,41 +405,45 @@ Final increase: ${memoryAfterClear.toFixed(2)} MB
       const benchmarks: BenchmarkResult[] = [];
 
       // Run all benchmarks
-      benchmarks.push(await runBenchmark('Quick Evaluation', 50, async () => {
-        const cards: Card[] = [
-          { rank: 'A', suit: 'h' },
-          { rank: 'A', suit: 'c' }
-        ];
-        const context: GameContext = {
-          potSize: 100,
-          stackSize: 1000,
-          position: 'late',
-          street: 'preflop',
-                    actionHistory: []
-        };
-        await ai.getOptimalAction(cards, [], context);
-      }));
+      benchmarks.push(
+        await runBenchmark('Quick Evaluation', 50, async () => {
+          const cards: Card[] = [
+            { rank: 'A', suit: 'h' },
+            { rank: 'A', suit: 'c' },
+          ];
+          const context: GameContext = {
+            potSize: 100,
+            stackSize: 1000,
+            position: 'late',
+            street: 'preflop',
+            actionHistory: [],
+          };
+          await ai.getOptimalAction(cards, [], context);
+        })
+      );
 
-      benchmarks.push(await runBenchmark('Complex Evaluation', 50, async () => {
-        const cards: Card[] = [
-          { rank: '7', suit: 'h' },
-          { rank: '6', suit: 'h' }
-        ];
-        const board: Card[] = [
-          { rank: '5', suit: 'h' },
-          { rank: '4', suit: 'c' },
-          { rank: '3', suit: 'd' }
-        ];
-        const context: GameContext = {
-          potSize: 500,
-          stackSize: 1500,
-          position: 'middle',
-          street: 'turn',
-                    actionHistory: []
-        };
-        ai.clearCache();
-        await ai.getOptimalAction(cards, board, context);
-      }));
+      benchmarks.push(
+        await runBenchmark('Complex Evaluation', 50, async () => {
+          const cards: Card[] = [
+            { rank: '7', suit: 'h' },
+            { rank: '6', suit: 'h' },
+          ];
+          const board: Card[] = [
+            { rank: '5', suit: 'h' },
+            { rank: '4', suit: 'c' },
+            { rank: '3', suit: 'd' },
+          ];
+          const context: GameContext = {
+            potSize: 500,
+            stackSize: 1500,
+            position: 'middle',
+            street: 'turn',
+            actionHistory: [],
+          };
+          ai.clearCache();
+          await ai.getOptimalAction(cards, board, context);
+        })
+      );
 
       // Generate summary report
       console.log(`
@@ -413,7 +453,9 @@ Final increase: ${memoryAfterClear.toFixed(2)} MB
 `);
 
       benchmarks.forEach(b => {
-        console.log(`║ ${b.name.padEnd(30)} │ Avg: ${b.avgTime.toFixed(2).padStart(8)}ms │ P95: ${b.p95.toFixed(2).padStart(8)}ms ║`);
+        console.log(
+          `║ ${b.name.padEnd(30)} │ Avg: ${b.avgTime.toFixed(2).padStart(8)}ms │ P95: ${b.p95.toFixed(2).padStart(8)}ms ║`
+        );
       });
 
       console.log(`╚════════════════════════════════════════════════════════════════╝
