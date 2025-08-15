@@ -8,9 +8,7 @@ export function debounce<T extends (...args: any[]) => any>(
 ): (...args: Parameters<T>) => void {
   let timeoutId: number | undefined
 
-  return function(this: any, ...args: Parameters<T>) {
-    const context = this
-
+  return function(...args: Parameters<T>) {
     // Clear the previous timeout if it exists
     if (timeoutId !== undefined) {
       clearTimeout(timeoutId)
@@ -18,7 +16,7 @@ export function debounce<T extends (...args: any[]) => any>(
 
     // Set a new timeout
     timeoutId = window.setTimeout(() => {
-      func.apply(context, args)
+      func(...args)
     }, delay)
   }
 }
@@ -35,18 +33,16 @@ export function throttle<T extends (...args: any[]) => any>(
   let lastFunc: number
   let lastRan: number
 
-  return function(this: any, ...args: Parameters<T>) {
-    const context = this
-
+  return function(...args: Parameters<T>) {
     if (!inThrottle) {
-      func.apply(context, args)
+      func(...args)
       lastRan = Date.now()
       inThrottle = true
     } else {
       clearTimeout(lastFunc)
       lastFunc = window.setTimeout(() => {
         if (Date.now() - lastRan >= limit) {
-          func.apply(context, args)
+          func(...args)
           lastRan = Date.now()
         }
       }, limit - (Date.now() - lastRan))
@@ -63,12 +59,10 @@ export function rafThrottle<T extends (...args: any[]) => any>(
 ): (...args: Parameters<T>) => void {
   let rafId: number | null = null
 
-  return function(this: any, ...args: Parameters<T>) {
-    const context = this
-
+  return function(...args: Parameters<T>) {
     if (rafId === null) {
       rafId = requestAnimationFrame(() => {
-        func.apply(context, args)
+        func(...args)
         rafId = null
       })
     }
@@ -126,7 +120,9 @@ export class LRUCache<K, V> {
     } else if (this.cache.size >= this.maxSize) {
       // Remove least recently used item
       const firstKey = this.cache.keys().next().value
-      this.cache.delete(firstKey)
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey)
+      }
     }
     this.cache.set(key, value)
   }

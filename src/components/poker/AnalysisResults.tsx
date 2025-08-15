@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import type { AdvancedAnalysis } from '../../types/poker'
 import { useAIAnalysis, useAIConfidence, useAIStrategy, useAnalysisSource } from '../../store/selectors'
 
@@ -76,7 +76,7 @@ const AnalysisResults = memo(({ analysis, calculationTime }: AnalysisResultsProp
                       fontSize: '0.875rem',
                       color: 'var(--color-text-secondary)'
                     }}>
-                      {(action.frequency * 100).toFixed(1)}% frequency
+                      {action.confidence ? `${(action.confidence * 100).toFixed(1)}% confidence` : 'Recommended'}
                     </span>
                   </div>
                   

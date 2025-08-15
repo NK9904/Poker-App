@@ -80,7 +80,7 @@ export class DeepSeekPokerAI {
     
     // Select action with highest expected value
     const bestAction = analysis.actions.reduce((best, current) => 
-      current.expectedValue > best.expectedValue ? current : best
+      (current.expectedValue ?? 0) > (best.expectedValue ?? 0) ? current : best
     )
     
     return bestAction

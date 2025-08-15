@@ -5,10 +5,9 @@ import type {
   HandRange, 
   AdvancedAnalysis, 
   GameContext,
-  AnalysisResult,
   ModelMetrics
 } from '../types/poker'
-import { pokerEngine, calculateHandStrength, getHandDescription } from '../utils/pokerEngine'
+import { pokerEngine } from '../utils/pokerEngine'
 import { DeepSeekPokerAI } from '../ai/DeepSeekPokerAI'
 
 interface PokerState {
@@ -207,7 +206,7 @@ export const usePokerStore = create<PokerState>()(
     initializeAI: async () => {
       try {
         const config = {
-          apiKey: process.env.VITE_DEEPSEEK_API_KEY || '',
+          apiKey: import.meta.env.VITE_DEEPSEEK_API_KEY || '',
           model: 'deepseek-chat',
           maxTokens: 4000,
           temperature: 0.1

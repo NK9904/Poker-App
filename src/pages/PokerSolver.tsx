@@ -1,9 +1,5 @@
-cursor/enhance-ui-with-3d-ai-poker-presenter-0287
-import React, { memo, useCallback, useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
-
-import React, { memo, useCallback, useState, useMemo, useEffect } from 'react'
- main
 import { usePokerStore } from '../store/pokerStore'
 import {
   usePlayerCards,
@@ -12,25 +8,16 @@ import {
   useEquity,
   useHandDescription,
   useAnalysis,
-cursor/enhance-ui-with-3d-ai-poker-presenter-0287
-
   useGameContext
-
-  useGtoStrategy,
-  useGameContext,
-  useAIAvailable,
-  useModelMetrics
-main
 } from '../store/selectors'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { CardDisplay } from '../components/ui/CardDisplay'
 import { MetricDisplay } from '../components/ui/MetricDisplay'
 import { CardSelector } from '../components/poker/CardSelector'
 import { GameContextControls } from '../components/poker/GameContextControls'
-import { AnalysisResults } from '../components/poker/AnalysisResults'
+import AnalysisResults from '../components/poker/AnalysisResults'
 import { AIModel3D } from '../components/AIModel3D'
 import { CardUtils } from '../utils/cardUtils'
-
 
 const PokerSolver = memo(() => {
   const [calculationTime, setCalculationTime] = useState<number>(0)
@@ -44,10 +31,7 @@ const PokerSolver = memo(() => {
     setLoading, 
     isLoading, 
     runFullAnalysis,
-    runAIAnalysis,
-    setGameContext,
-    initializeAI,
-    clearAICache
+    setGameContext
   } = usePokerStore()
   
   const playerCards = usePlayerCards()
@@ -57,13 +41,6 @@ const PokerSolver = memo(() => {
   const handDescription = useHandDescription()
   const analysis = useAnalysis()
   const gameContext = useGameContext()
-  const isAIAvailable = useAIAvailable()
-  const modelMetrics = useModelMetrics()
-
-  // Initialize AI on component mount
-  useEffect(() => {
-    initializeAI()
-  }, [initializeAI])
 
   // Enhanced calculation function with AI modeling
   const runAdvancedAnalysis = useCallback(async () => {
@@ -72,7 +49,6 @@ const PokerSolver = memo(() => {
     setIsThinking(true)
 
     try {
- cursor/enhance-ui-with-3d-ai-poker-presenter-0287
       // Simulate AI thinking process
       setTimeout(() => {
         const decisions = ['Raise', 'Call', 'Fold', 'Check']
@@ -87,21 +63,12 @@ const PokerSolver = memo(() => {
       // Run comprehensive AI analysis
       await runFullAnalysis()
       
-      // Run comprehensive AI analysis if available
-      if (isAIAvailable) {
-        await runAIAnalysis()
-      } else {
-        // Fallback to traditional analysis
-        await runFullAnalysis()
-      }
- main
-      
       const endTime = performance.now()
       setCalculationTime(endTime - startTime)
     } finally {
       setLoading(false)
     }
-  }, [runFullAnalysis, runAIAnalysis, setLoading, isAIAvailable])
+  }, [runFullAnalysis, setLoading])
 
   // Enhanced card selection with better validation
   const handlePlayerCardSelect = useCallback((cardString: string) => {
@@ -138,65 +105,6 @@ const PokerSolver = memo(() => {
     setGameContext(updates)
   }, [setGameContext])
 
-  // AI status indicator
-  const aiStatusIndicator = useMemo(() => {
-    if (!isAIAvailable) {
-      return (
-        <div style={{ 
-          padding: '0.5rem', 
-          backgroundColor: 'var(--color-warning)', 
-          color: 'white', 
-          borderRadius: '0.5rem',
-          marginBottom: '1rem'
-        }}>
-          ⚠️ AI features disabled - DeepSeek API key not configured
-        </div>
-      )
-    }
-
-    if (modelMetrics) {
-      return (
-        <div style={{ 
-          padding: '0.5rem', 
-          backgroundColor: 'var(--color-success)', 
-          color: 'white', 
-          borderRadius: '0.5rem',
-          marginBottom: '1rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <span>🤖 DeepSeek AI Active (v{modelMetrics.version})</span>
-          <button 
-            onClick={clearAICache}
-            style={{ 
-              background: 'rgba(255,255,255,0.2)', 
-              border: 'none', 
-              color: 'white',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.25rem',
-              cursor: 'pointer'
-            }}
-          >
-            Clear Cache
-          </button>
-        </div>
-      )
-    }
-
-    return (
-      <div style={{ 
-        padding: '0.5rem', 
-        backgroundColor: 'var(--color-info)', 
-        color: 'white', 
-        borderRadius: '0.5rem',
-        marginBottom: '1rem'
-      }}>
-        🔄 Initializing AI model...
-      </div>
-    )
-  }, [isAIAvailable, modelMetrics, clearAICache])
-
   return (
     <div className="poker-solver" style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
       <motion.div 
@@ -216,11 +124,9 @@ const PokerSolver = memo(() => {
           AI Poker Solver
         </h1>
         <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.125rem' }}>
-          Advanced GTO solver powered by DeepSeek AI trained on professional poker data
+          Advanced GTO solver with machine learning-powered analysis
         </p>
       </motion.div>
-
-      {aiStatusIndicator}
 
       <GameContextControls
         gameContext={gameContext}
@@ -291,7 +197,6 @@ const PokerSolver = memo(() => {
             </div>
           </div>
 
-cursor/enhance-ui-with-3d-ai-poker-presenter-0287
           {/* Quick Analysis Section */}
           <div className="card" style={{ marginBottom: '2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
@@ -330,65 +235,8 @@ cursor/enhance-ui-with-3d-ai-poker-presenter-0287
           </div>
 
           <AnalysisResults analysis={analysis} calculationTime={calculationTime} />
-
-      {/* Quick Analysis Section */}
-      <div className="card" style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h3 style={{ color: 'var(--color-accent)' }}>
-            {isAIAvailable ? 'AI-Powered Analysis' : 'Quick Analysis'}
-          </h3>
-          <button 
-            onClick={runAdvancedAnalysis}
-            disabled={isLoading || playerCards.length === 0}
-            className="btn btn-primary"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-          >
-            {isLoading ? (
-              <>
-                <LoadingSpinner size="sm" />
-                Analyzing...
-              </>
-            ) : (
-              <>
-                {isAIAvailable ? '🤖' : '⚡'}
-                {isAIAvailable ? 'Run AI Analysis' : 'Run Analysis'}
-              </>
-            )}
-          </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-          <MetricDisplay
-            label="Hand"
-            value={handDescription}
-            color="var(--color-accent)"
-          />
-          <MetricDisplay
-            label="Hand Strength"
-            value={`${(handStrength * 100).toFixed(1)}%`}
-            color="var(--color-accent)"
-          />
-          <MetricDisplay
-            label="Equity"
-            value={`${(equity * 100).toFixed(1)}%`}
-            color="var(--color-success)"
-          />
-          <MetricDisplay
-            label="Analysis Time"
-            value={`${calculationTime.toFixed(1)}ms`}
-            color="var(--color-warning)"
-          />
-          {modelMetrics && (
-            <MetricDisplay
-              label="AI Confidence"
-              value={`${(modelMetrics.averageConfidence * 100).toFixed(1)}%`}
-              color="var(--color-info)"
-            />
-          )}
-main
-        </div>
-
-cursor/enhance-ui-with-3d-ai-poker-presenter-0287
         {/* AI Model Panel */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
@@ -446,9 +294,6 @@ cursor/enhance-ui-with-3d-ai-poker-presenter-0287
           </div>
         </motion.div>
       </div>
-
-      <AnalysisResults analysis={analysis} calculationTime={calculationTime} />
- main
     </div>
   )
 })
