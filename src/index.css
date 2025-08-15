@@ -47,6 +47,20 @@ body {
 img, video {
   height: auto;
   max-width: 100%;
+  /* Improve image loading performance */
+  loading: lazy;
+  decoding: async;
+}
+
+/* Reduce paint on animations */
+* {
+  will-change: auto;
+}
+
+/* GPU acceleration for common elements */
+.btn, .card, .loading {
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 /* Smooth scrolling with performance consideration */
