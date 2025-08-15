@@ -1,6 +1,6 @@
 import { OpenSourcePokerAI } from '../../ai/OpenSourcePokerAI';
 import { PokerEngine } from '../../utils/pokerEngine';
-import type { Card, GameContext } from '../../types/poker';
+import type { Card, GameContext, Rank, Suit } from '../../types/poker';
 
 interface BenchmarkResult {
   name: string;
@@ -88,8 +88,8 @@ P99: ${result.p99.toFixed(2)}ms
   describe('Single Prediction Benchmarks', () => {
     it('should benchmark simple hand evaluation', async () => {
       const playerCards: Card[] = [
-        { rank: 'A', suit: 'hearts', value: 14 },
-        { rank: 'K', suit: 'hearts', value: 13 }
+        { rank: 'A', suit: 'h' },
+        { rank: 'K', suit: 'h' }
       ];
 
       const gameContext: GameContext = {
@@ -97,8 +97,7 @@ P99: ${result.p99.toFixed(2)}ms
         stackSize: 1000,
         position: 'late',
         street: 'preflop',
-        players: 4,
-        actionHistory: []
+                actionHistory: []
       };
 
       const result = await runBenchmark(
@@ -117,14 +116,14 @@ P99: ${result.p99.toFixed(2)}ms
 
     it('should benchmark complex board evaluation', async () => {
       const playerCards: Card[] = [
-        { rank: 'Q', suit: 'hearts', value: 12 },
-        { rank: 'J', suit: 'hearts', value: 11 }
+        { rank: 'Q', suit: 'h' },
+        { rank: 'J', suit: 'h' }
       ];
 
       const boardCards: Card[] = [
-        { rank: '10', suit: 'hearts', value: 10 },
-        { rank: '9', suit: 'hearts', value: 9 },
-        { rank: '8', suit: 'clubs', value: 8 }
+        { rank: 'T', suit: 'h' },
+        { rank: '9', suit: 'h' },
+        { rank: '8', suit: 'c' }
       ];
 
       const gameContext: GameContext = {
@@ -132,8 +131,7 @@ P99: ${result.p99.toFixed(2)}ms
         stackSize: 1500,
         position: 'middle',
         street: 'turn',
-        players: 3,
-        actionHistory: []
+                actionHistory: []
       };
 
       const result = await runBenchmark(
@@ -157,16 +155,15 @@ P99: ${result.p99.toFixed(2)}ms
     it('should benchmark parallel predictions', async () => {
       const scenarios = Array.from({ length: 20 }, (_, i) => ({
         playerCards: [
-          { rank: ['A', 'K', 'Q', 'J'][i % 4], suit: 'hearts', value: 14 - (i % 4) },
-          { rank: ['A', 'K', 'Q', 'J'][(i + 1) % 4], suit: 'clubs', value: 14 - ((i + 1) % 4) }
+          { rank: ['A', 'K', 'Q', 'J'][i % 4] as Rank, suit: 'h' as Suit },
+          { rank: ['A', 'K', 'Q', 'J'][(i + 1) % 4] as Rank, suit: 'c' as Suit }
         ] as Card[],
         gameContext: {
           potSize: 100 + i * 10,
           stackSize: 1000,
           position: ['early', 'middle', 'late'][i % 3] as 'early' | 'middle' | 'late',
           street: 'preflop' as const,
-          players: 4,
-          actionHistory: []
+                    actionHistory: []
         }
       }));
 
@@ -191,16 +188,15 @@ P99: ${result.p99.toFixed(2)}ms
     it('should benchmark sequential predictions', async () => {
       const scenarios = Array.from({ length: 10 }, (_, i) => ({
         playerCards: [
-          { rank: ['A', 'K', 'Q', 'J'][i % 4], suit: 'hearts', value: 14 - (i % 4) },
-          { rank: ['A', 'K', 'Q', 'J'][(i + 1) % 4], suit: 'clubs', value: 14 - ((i + 1) % 4) }
+          { rank: ['A', 'K', 'Q', 'J'][i % 4] as Rank, suit: 'h' as Suit },
+          { rank: ['A', 'K', 'Q', 'J'][(i + 1) % 4] as Rank, suit: 'c' as Suit }
         ] as Card[],
         gameContext: {
           potSize: 100 + i * 10,
           stackSize: 1000,
           position: ['early', 'middle', 'late'][i % 3] as 'early' | 'middle' | 'late',
           street: 'preflop' as const,
-          players: 4,
-          actionHistory: []
+                    actionHistory: []
         }
       }));
 
@@ -224,8 +220,8 @@ P99: ${result.p99.toFixed(2)}ms
   describe('Cache Performance', () => {
     it('should benchmark cache hit performance', async () => {
       const playerCards: Card[] = [
-        { rank: 'K', suit: 'hearts', value: 13 },
-        { rank: 'K', suit: 'clubs', value: 13 }
+        { rank: 'K', suit: 'h' },
+        { rank: 'K', suit: 'c' }
       ];
 
       const gameContext: GameContext = {
@@ -233,8 +229,7 @@ P99: ${result.p99.toFixed(2)}ms
         stackSize: 800,
         position: 'late',
         street: 'flop',
-        players: 4,
-        actionHistory: []
+                actionHistory: []
       };
 
       // Prime the cache
@@ -262,8 +257,8 @@ P99: ${result.p99.toFixed(2)}ms
           // Generate unique hands to force cache misses
           const uniqueValue = Math.random();
           const playerCards: Card[] = [
-            { rank: 'A', suit: 'hearts', value: 14 },
-            { rank: 'K', suit: 'clubs', value: 13 }
+            { rank: 'A', suit: 'h' },
+            { rank: 'K', suit: 'c' }
           ];
 
           const gameContext: GameContext = {
@@ -271,8 +266,7 @@ P99: ${result.p99.toFixed(2)}ms
             stackSize: 1000,
             position: 'middle',
             street: 'preflop',
-            players: 4,
-            actionHistory: []
+                        actionHistory: []
           };
 
           ai.clearCache(); // Force cache miss
@@ -293,8 +287,8 @@ P99: ${result.p99.toFixed(2)}ms
       // Generate many unique scenarios
       for (let i = 0; i < 1000; i++) {
         const playerCards: Card[] = [
-          { rank: String((i % 13) + 2), suit: 'hearts', value: (i % 13) + 2 },
-          { rank: String(((i + 1) % 13) + 2), suit: 'clubs', value: ((i + 1) % 13) + 2 }
+          { rank: (((i % 13) + 2) === 10 ? 'T' : String((i % 13) + 2)) as Rank, suit: 'h' as Suit },
+          { rank: ((((i + 1) % 13) + 2) === 10 ? 'T' : String(((i + 1) % 13) + 2)) as Rank, suit: 'c' as Suit }
         ];
 
         const gameContext: GameContext = {
@@ -302,8 +296,7 @@ P99: ${result.p99.toFixed(2)}ms
           stackSize: 1000 - i,
           position: ['early', 'middle', 'late'][i % 3] as 'early' | 'middle' | 'late',
           street: 'preflop',
-          players: 4,
-          actionHistory: []
+                    actionHistory: []
         };
 
         await ai.analyzeSituation(playerCards, [], gameContext);
@@ -345,8 +338,8 @@ Final increase: ${memoryAfterClear.toFixed(2)} MB
         async () => {
           const promises = Array.from({ length: concurrentRequests }, (_, i) => {
             const playerCards: Card[] = [
-              { rank: ['A', 'K', 'Q', 'J'][i % 4], suit: 'hearts', value: 14 - (i % 4) },
-              { rank: ['A', 'K', 'Q', 'J'][(i + 1) % 4], suit: 'clubs', value: 14 - ((i + 1) % 4) }
+              { rank: ['A', 'K', 'Q', 'J'][i % 4] as Rank, suit: 'h' as Suit },
+              { rank: ['A', 'K', 'Q', 'J'][(i + 1) % 4] as Rank, suit: 'c' as Suit }
             ];
 
             const gameContext: GameContext = {
@@ -354,8 +347,7 @@ Final increase: ${memoryAfterClear.toFixed(2)} MB
               stackSize: 1000,
               position: 'middle',
               street: 'preflop',
-              players: 4,
-              actionHistory: []
+                            actionHistory: []
             };
 
             return ai.getOptimalAction(playerCards, [], gameContext);
@@ -379,37 +371,35 @@ Final increase: ${memoryAfterClear.toFixed(2)} MB
       // Run all benchmarks
       benchmarks.push(await runBenchmark('Quick Evaluation', 50, async () => {
         const cards: Card[] = [
-          { rank: 'A', suit: 'hearts', value: 14 },
-          { rank: 'A', suit: 'clubs', value: 14 }
+          { rank: 'A', suit: 'h' },
+          { rank: 'A', suit: 'c' }
         ];
         const context: GameContext = {
           potSize: 100,
           stackSize: 1000,
           position: 'late',
           street: 'preflop',
-          players: 4,
-          actionHistory: []
+                    actionHistory: []
         };
         await ai.getOptimalAction(cards, [], context);
       }));
 
       benchmarks.push(await runBenchmark('Complex Evaluation', 50, async () => {
         const cards: Card[] = [
-          { rank: '7', suit: 'hearts', value: 7 },
-          { rank: '6', suit: 'hearts', value: 6 }
+          { rank: '7', suit: 'h' },
+          { rank: '6', suit: 'h' }
         ];
         const board: Card[] = [
-          { rank: '5', suit: 'hearts', value: 5 },
-          { rank: '4', suit: 'clubs', value: 4 },
-          { rank: '3', suit: 'diamonds', value: 3 }
+          { rank: '5', suit: 'h' },
+          { rank: '4', suit: 'c' },
+          { rank: '3', suit: 'd' }
         ];
         const context: GameContext = {
           potSize: 500,
           stackSize: 1500,
           position: 'middle',
           street: 'turn',
-          players: 3,
-          actionHistory: []
+                    actionHistory: []
         };
         ai.clearCache();
         await ai.getOptimalAction(cards, board, context);

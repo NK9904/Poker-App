@@ -1,6 +1,6 @@
 import { OpenSourcePokerAI } from '../../ai/OpenSourcePokerAI';
 import { PokerEngine } from '../../utils/pokerEngine';
-import type { Card, GameContext } from '../../types/poker';
+import type { Card, GameContext, Rank, Suit } from '../../types/poker';
 
 describe('Model Predictions Integration Tests', () => {
   let ai: OpenSourcePokerAI;
@@ -27,22 +27,22 @@ describe('Model Predictions Integration Tests', () => {
       const premiumHands = [
         { // Pocket Aces
           playerCards: [
-            { rank: 'A', suit: 'hearts', value: 14 },
-            { rank: 'A', suit: 'clubs', value: 14 }
+            { rank: 'A', suit: 'h' },
+            { rank: 'A', suit: 'c' }
           ],
           expectedAction: 'raise'
         },
         { // Pocket Kings
           playerCards: [
-            { rank: 'K', suit: 'hearts', value: 13 },
-            { rank: 'K', suit: 'clubs', value: 13 }
+            { rank: 'K', suit: 'h' },
+            { rank: 'K', suit: 'c' }
           ],
           expectedAction: 'raise'
         },
         { // Ace-King suited
           playerCards: [
-            { rank: 'A', suit: 'hearts', value: 14 },
-            { rank: 'K', suit: 'hearts', value: 13 }
+            { rank: 'A', suit: 'h' },
+            { rank: 'K', suit: 'h' }
           ],
           expectedAction: 'raise'
         }
@@ -53,12 +53,11 @@ describe('Model Predictions Integration Tests', () => {
         stackSize: 1000,
         position: 'late',
         street: 'preflop',
-        players: 6,
-        actionHistory: []
+                actionHistory: []
       };
 
       for (const hand of premiumHands) {
-        const action = await ai.getOptimalAction(hand.playerCards, [], gameContext);
+        const action = await ai.getOptimalAction(hand.playerCards as Card[], [], gameContext);
         expect(action.action).toBe(hand.expectedAction);
         expect(action.confidence).toBeGreaterThan(0.6);
       }
@@ -68,15 +67,15 @@ describe('Model Predictions Integration Tests', () => {
       const weakHands = [
         { // 7-2 offsuit
           playerCards: [
-            { rank: '7', suit: 'hearts', value: 7 },
-            { rank: '2', suit: 'clubs', value: 2 }
+            { rank: '7', suit: 'h' },
+            { rank: '2', suit: 'c' }
           ],
           expectedActions: ['fold', 'check']
         },
         { // 3-8 offsuit
           playerCards: [
-            { rank: '3', suit: 'diamonds', value: 3 },
-            { rank: '8', suit: 'spades', value: 8 }
+            { rank: '3', suit: 'd' },
+            { rank: '8', suit: 's' }
           ],
           expectedActions: ['fold', 'check']
         }
@@ -87,20 +86,19 @@ describe('Model Predictions Integration Tests', () => {
         stackSize: 1000,
         position: 'early',
         street: 'preflop',
-        players: 6,
-        actionHistory: []
+                actionHistory: []
       };
 
       for (const hand of weakHands) {
-        const action = await ai.getOptimalAction(hand.playerCards, [], gameContext);
+        const action = await ai.getOptimalAction(hand.playerCards as Card[], [], gameContext);
         expect(hand.expectedActions).toContain(action.action);
       }
     });
 
     it('should adjust strategy based on position', async () => {
       const playerCards: Card[] = [
-        { rank: 'Q', suit: 'hearts', value: 12 },
-        { rank: 'J', suit: 'hearts', value: 11 }
+        { rank: 'Q', suit: 'h' },
+        { rank: 'J', suit: 'h' }
       ];
 
       const earlyPositionContext: GameContext = {
@@ -108,8 +106,7 @@ describe('Model Predictions Integration Tests', () => {
         stackSize: 1000,
         position: 'early',
         street: 'preflop',
-        players: 6,
-        actionHistory: []
+                actionHistory: []
       };
 
       const latePositionContext: GameContext = {
@@ -128,8 +125,8 @@ describe('Model Predictions Integration Tests', () => {
 
     it('should adapt to different board textures', async () => {
       const playerCards: Card[] = [
-        { rank: 'A', suit: 'hearts', value: 14 },
-        { rank: 'K', suit: 'clubs', value: 13 }
+        { rank: 'A', suit: 'h' },
+        { rank: 'K', suit: 'c' }
       ];
 
       const gameContext: GameContext = {
@@ -137,22 +134,21 @@ describe('Model Predictions Integration Tests', () => {
         stackSize: 900,
         position: 'middle',
         street: 'flop',
-        players: 4,
-        actionHistory: []
+                actionHistory: []
       };
 
       // Dry board (rainbow, no straight/flush draws)
       const dryBoard: Card[] = [
-        { rank: 'K', suit: 'diamonds', value: 13 },
-        { rank: '7', suit: 'clubs', value: 7 },
-        { rank: '2', suit: 'hearts', value: 2 }
+        { rank: 'K', suit: 'd' },
+        { rank: '7', suit: 'c' },
+        { rank: '2', suit: 'h' }
       ];
 
       // Wet board (flush draw, straight draw)
       const wetBoard: Card[] = [
-        { rank: '10', suit: 'hearts', value: 10 },
-        { rank: 'J', suit: 'hearts', value: 11 },
-        { rank: 'Q', suit: 'hearts', value: 12 }
+        { rank: 'T', suit: 'h' },
+        { rank: 'J', suit: 'h' },
+        { rank: 'Q', suit: 'h' }
       ];
 
       const dryBoardAction = await ai.getOptimalAction(playerCards, dryBoard, gameContext);
@@ -169,14 +165,14 @@ describe('Model Predictions Integration Tests', () => {
   describe('Consistency Tests', () => {
     it('should provide consistent predictions for identical situations', async () => {
       const playerCards: Card[] = [
-        { rank: '10', suit: 'hearts', value: 10 },
-        { rank: '10', suit: 'clubs', value: 10 }
+        { rank: 'T', suit: 'h' },
+        { rank: 'T', suit: 'c' }
       ];
 
       const boardCards: Card[] = [
-        { rank: '10', suit: 'diamonds', value: 10 },
-        { rank: '5', suit: 'hearts', value: 5 },
-        { rank: '2', suit: 'clubs', value: 2 }
+        { rank: 'T', suit: 'd' },
+        { rank: '5', suit: 'h' },
+        { rank: '2', suit: 'c' }
       ];
 
       const gameContext: GameContext = {
@@ -184,8 +180,7 @@ describe('Model Predictions Integration Tests', () => {
         stackSize: 700,
         position: 'late',
         street: 'flop',
-        players: 3,
-        actionHistory: []
+                actionHistory: []
       };
 
       const predictions = await Promise.all([
@@ -203,21 +198,21 @@ describe('Model Predictions Integration Tests', () => {
       const scenarios = [
         {
           playerCards: [
-            { rank: 'A', suit: 'hearts', value: 14 },
-            { rank: 'A', suit: 'clubs', value: 14 }
+            { rank: 'A', suit: 'h' },
+            { rank: 'A', suit: 'c' }
           ],
           boardCards: [],
           minConfidence: 0.7 // Strong hand, high confidence
         },
         {
           playerCards: [
-            { rank: '7', suit: 'hearts', value: 7 },
-            { rank: '6', suit: 'clubs', value: 6 }
+            { rank: '7', suit: 'h' },
+            { rank: '6', suit: 'c' }
           ],
           boardCards: [
-            { rank: 'A', suit: 'diamonds', value: 14 },
-            { rank: 'K', suit: 'spades', value: 13 },
-            { rank: 'Q', suit: 'hearts', value: 12 }
+            { rank: 'A', suit: 'd' },
+            { rank: 'K', suit: 's' },
+            { rank: 'Q', suit: 'h' }
           ],
           minConfidence: 0.5 // Weak hand on scary board
         }
@@ -228,14 +223,13 @@ describe('Model Predictions Integration Tests', () => {
         stackSize: 1000,
         position: 'middle',
         street: 'flop',
-        players: 4,
-        actionHistory: []
+                actionHistory: []
       };
 
       for (const scenario of scenarios) {
         const analysis = await ai.analyzeSituation(
-          scenario.playerCards,
-          scenario.boardCards,
+          scenario.playerCards as Card[],
+          scenario.boardCards as Card[],
           gameContext
         );
         
@@ -248,8 +242,8 @@ describe('Model Predictions Integration Tests', () => {
   describe('Performance Benchmarks', () => {
     it('should complete predictions within acceptable time limits', async () => {
       const playerCards: Card[] = [
-        { rank: 'J', suit: 'hearts', value: 11 },
-        { rank: 'J', suit: 'clubs', value: 11 }
+        { rank: 'J', suit: 'h' },
+        { rank: 'J', suit: 'c' }
       ];
 
       const gameContext: GameContext = {
@@ -257,8 +251,7 @@ describe('Model Predictions Integration Tests', () => {
         stackSize: 850,
         position: 'late',
         street: 'preflop',
-        players: 5,
-        actionHistory: []
+                actionHistory: []
       };
 
       const startTime = performance.now();
@@ -274,22 +267,21 @@ describe('Model Predictions Integration Tests', () => {
     it('should handle batch predictions efficiently', async () => {
       const scenarios = Array.from({ length: 10 }, (_, i) => ({
         playerCards: [
-          { rank: String((i % 13) + 2), suit: 'hearts', value: (i % 13) + 2 },
-          { rank: String(((i + 1) % 13) + 2), suit: 'clubs', value: ((i + 1) % 13) + 2 }
+          { rank: (((i % 13) + 2) === 10 ? 'T' : String((i % 13) + 2)) as Rank, suit: 'h' as Suit },
+          { rank: ((((i + 1) % 13) + 2) === 10 ? 'T' : String(((i + 1) % 13) + 2)) as Rank, suit: 'c' as Suit }
         ],
         gameContext: {
           potSize: 100 + i * 10,
           stackSize: 1000 - i * 10,
           position: ['early', 'middle', 'late'][i % 3] as 'early' | 'middle' | 'late',
           street: 'preflop' as const,
-          players: 4,
-          actionHistory: []
+                    actionHistory: []
         }
       }));
 
       const startTime = performance.now();
       const predictions = await Promise.all(
-        scenarios.map(s => ai.getOptimalAction(s.playerCards, [], s.gameContext))
+        scenarios.map(s => ai.getOptimalAction(s.playerCards as Card[], [], s.gameContext))
       );
       const endTime = performance.now();
 
@@ -304,8 +296,8 @@ describe('Model Predictions Integration Tests', () => {
   describe('Edge Cases', () => {
     it('should handle all-in situations', async () => {
       const playerCards: Card[] = [
-        { rank: 'K', suit: 'hearts', value: 13 },
-        { rank: 'K', suit: 'clubs', value: 13 }
+        { rank: 'K', suit: 'h' },
+        { rank: 'K', suit: 'c' }
       ];
 
       const gameContext: GameContext = {
@@ -313,8 +305,7 @@ describe('Model Predictions Integration Tests', () => {
         stackSize: 100, // Short stack
         position: 'late',
         street: 'flop',
-        players: 2,
-        actionHistory: []
+                actionHistory: []
       };
 
       const action = await ai.getOptimalAction(playerCards, [], gameContext);
@@ -327,8 +318,8 @@ describe('Model Predictions Integration Tests', () => {
 
     it('should handle heads-up vs multi-way pots differently', async () => {
       const playerCards: Card[] = [
-        { rank: 'Q', suit: 'hearts', value: 12 },
-        { rank: 'Q', suit: 'clubs', value: 12 }
+        { rank: 'Q', suit: 'h' },
+        { rank: 'Q', suit: 'c' }
       ];
 
       const headsUpContext: GameContext = {
@@ -336,14 +327,12 @@ describe('Model Predictions Integration Tests', () => {
         stackSize: 1000,
         position: 'late',
         street: 'flop',
-        players: 2,
-        actionHistory: []
+                actionHistory: []
       };
 
       const multiWayContext: GameContext = {
         ...headsUpContext,
-        players: 6
-      };
+              };
 
       const headsUpAction = await ai.getOptimalAction(playerCards, [], headsUpContext);
       const multiWayAction = await ai.getOptimalAction(playerCards, [], multiWayContext);
@@ -360,16 +349,14 @@ describe('Model Predictions Integration Tests', () => {
 
     it('should handle incomplete information gracefully', async () => {
       const playerCards: Card[] = [
-        { rank: '9', suit: 'hearts', value: 9 },
-        { rank: '8', suit: 'hearts', value: 8 }
+        { rank: '9', suit: 'h' },
+        { rank: '8', suit: 'h' }
       ];
 
       const minimalContext: GameContext = {
         potSize: 0,
         stackSize: 0,
         position: 'middle',
-        street: undefined as any,
-        players: 0,
         actionHistory: []
       };
 
@@ -393,8 +380,8 @@ describe('Model Predictions Integration Tests', () => {
       const predictions = 5;
       for (let i = 0; i < predictions; i++) {
         const playerCards: Card[] = [
-          { rank: String((i % 13) + 2), suit: 'hearts', value: (i % 13) + 2 },
-          { rank: String(((i + 1) % 13) + 2), suit: 'clubs', value: ((i + 1) % 13) + 2 }
+          { rank: (((i % 13) + 2) === 10 ? 'T' : String((i % 13) + 2)) as Rank, suit: 'h' as Suit },
+          { rank: ((((i + 1) % 13) + 2) === 10 ? 'T' : String(((i + 1) % 13) + 2)) as Rank, suit: 'c' as Suit }
         ];
         
         const gameContext: GameContext = {
@@ -402,8 +389,7 @@ describe('Model Predictions Integration Tests', () => {
           stackSize: 1000,
           position: 'middle',
           street: 'preflop',
-          players: 4,
-          actionHistory: []
+                    actionHistory: []
         };
 
         await ai.analyzeSituation(playerCards, [], gameContext);

@@ -3,6 +3,7 @@ export interface PerformanceMetric {
   name: string
   value: number
   timestamp: number
+  metadata?: Record<string, unknown>
 }
 
 export interface MemoryUsage {

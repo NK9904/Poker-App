@@ -1,46 +1,38 @@
-// Production-safe logger that only logs in development
-const isDev = import.meta.env.DEV
+// Production-ready logger with environment-based output
+const isDevelopment = import.meta.env.DEV
 
 export const logger = {
-  log: (...args: any[]) => {
-    if (isDev) {
+  log: (...args: unknown[]) => {
+    if (isDevelopment) {
       console.log(...args)
     }
   },
   
-  warn: (...args: any[]) => {
-    if (isDev) {
+  warn: (...args: unknown[]) => {
+    if (isDevelopment) {
       console.warn(...args)
     }
   },
   
-  error: (...args: any[]) => {
-    // Always log errors, but in production send to monitoring service
-    if (isDev) {
+  error: (...args: unknown[]) => {
+    // Always log errors, even in production (for monitoring)
+    if (isDevelopment) {
       console.error(...args)
     } else {
-      // In production, you could send to error tracking service
-      // Example: Sentry.captureException(args[0])
+      // In production, you might want to send to an error tracking service
+      console.error(...args)
     }
   },
   
-  debug: (...args: any[]) => {
-    if (isDev) {
+  debug: (...args: unknown[]) => {
+    if (isDevelopment) {
       console.debug(...args)
     }
   },
   
-  time: (label: string) => {
-    if (isDev) {
-      console.time(label)
-    }
-  },
-  
-  timeEnd: (label: string) => {
-    if (isDev) {
-      console.timeEnd(label)
+  info: (...args: unknown[]) => {
+    if (isDevelopment) {
+      console.info(...args)
     }
   }
 }
-
-export default logger

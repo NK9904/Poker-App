@@ -1,135 +1,152 @@
-// Performance monitoring utilities
+import { logger } from './logger'
 
+/**
+ * Performance monitoring utilities
+ */
+
+// Performance metrics interface
 export interface PerformanceMetric {
   name: string
   value: number
   timestamp: number
+  metadata?: Record<string, unknown>
 }
 
-class PerformanceMonitor {
-  private metrics: PerformanceMetric[] = []
-  private observers: PerformanceObserver[] = []
-
-  constructor() {
-    this.setupObservers()
-  }
-
-  private setupObservers() {
-    // Long Tasks Observer
-    if ('PerformanceObserver' in window) {
-      try {
-        const longTaskObserver = new PerformanceObserver((list) => {
-          list.getEntries().forEach((entry) => {
-            console.warn(`Long task detected: ${entry.duration}ms`, entry)
-            this.addMetric('long-task', entry.duration)
-          })
-        })
-        longTaskObserver.observe({ entryTypes: ['longtask'] })
-        this.observers.push(longTaskObserver)
-      } catch {
-        console.log('Long task observer not supported')
-      }
-
-      // Layout Shift Observer
-      try {
-        const clsObserver = new PerformanceObserver((list) => {
-          list.getEntries().forEach((entry: any) => {
-            if (!entry.hadRecentInput) {
-              this.addMetric('layout-shift', entry.value)
-            }
-          })
-        })
-        clsObserver.observe({ entryTypes: ['layout-shift'] })
-        this.observers.push(clsObserver)
-      } catch {
-        console.log('Layout shift observer not supported')
-      }
+// Performance observer for long tasks
+export function observeLongTasks(threshold = 50): void {
+  if ('PerformanceObserver' in window) {
+    try {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (entry.duration > threshold) {
+            logger.warn(`Long task detected: ${entry.duration}ms`, entry)
+          }
+        }
+      })
+      
+      observer.observe({ entryTypes: ['longtask'] })
+    } catch (error) {
+      logger.log('Long task observer not supported')
     }
-  }
-
-  addMetric(name: string, value: number) {
-    this.metrics.push({
-      name,
-      value,
-      timestamp: Date.now()
-    })
-  }
-
-  getMetrics(name?: string): PerformanceMetric[] {
-    if (name) {
-      return this.metrics.filter(m => m.name === name)
-    }
-    return this.metrics
-  }
-
-  clearMetrics() {
-    this.metrics = []
-  }
-
-  disconnect() {
-    this.observers.forEach(observer => observer.disconnect())
-    this.observers = []
   }
 }
 
-// Global performance monitor instance
-export const performanceMonitor = new PerformanceMonitor()
+// Layout shift monitoring
+export function observeLayoutShifts(): void {
+  if ('PerformanceObserver' in window) {
+    try {
+      const observer = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry: PerformanceEntry) => {
+          const layoutShift = entry as LayoutShift
+          if (layoutShift.hadRecentInput) return
+          
+          logger.log('Layout shift detected:', layoutShift.value)
+        })
+      })
+      
+      observer.observe({ entryTypes: ['layout-shift'] })
+    } catch (error) {
+      logger.log('Layout shift observer not supported')
+    }
+  }
+}
 
-// Timing utilities
-export function measureAsync<T>(
+// Type for LayoutShift entry
+interface LayoutShift extends PerformanceEntry {
+  value: number
+  hadRecentInput: boolean
+}
+
+// Global performance metrics storage
+const performanceMetrics: PerformanceMetric[] = []
+
+export function addPerformanceMetric(name: string, value: number): void {
+  performanceMetrics.push({
+    name,
+    value,
+    timestamp: Date.now()
+  })
+}
+
+export function getPerformanceMetrics(name?: string): PerformanceMetric[] {
+  if (name) {
+    return performanceMetrics.filter(m => m.name === name)
+  }
+  return performanceMetrics
+}
+
+// Performance timing helper
+export function measurePerformance(name: string, fn: () => void): void {
+  const start = performance.now()
+  fn()
+  const duration = performance.now() - start
+  
+  if (duration > 16) { // Log if takes more than one frame
+    logger.log(`${name}: ${duration.toFixed(2)}ms`)
+  }
+}
+
+// Async performance timing helper
+export async function measureAsyncPerformance<T>(
   name: string,
   fn: () => Promise<T>
 ): Promise<T> {
   const start = performance.now()
+  const result = await fn()
+  const duration = performance.now() - start
   
-  return fn().finally(() => {
-    const duration = performance.now() - start
-    performanceMonitor.addMetric(name, duration)
-    console.log(`${name}: ${duration.toFixed(2)}ms`)
-  })
-}
-
-export function measureSync<T>(
-  name: string,
-  fn: () => T
-): T {
-  const start = performance.now()
-  
-  try {
-    return fn()
-  } finally {
-    const duration = performance.now() - start
-    performanceMonitor.addMetric(name, duration)
-    console.log(`${name}: ${duration.toFixed(2)}ms`)
+  if (duration > 100) { // Log if takes more than 100ms
+    logger.log(`${name}: ${duration.toFixed(2)}ms`)
   }
+  
+  return result
 }
 
-// Memory utilities
-export function getMemoryUsage() {
-  if ('memory' in performance) {
-    const memory = (performance as any).memory
+// Memory usage monitoring (Chrome only)
+export function getMemoryUsage(): { used: number; total: number } | null {
+  const memory = (performance as PerformanceWithMemory).memory
+  
+  if (memory) {
     return {
-      used: Math.round(memory.usedJSHeapSize / 1024 / 1024),
-      total: Math.round(memory.totalJSHeapSize / 1024 / 1024),
-      limit: Math.round(memory.jsHeapSizeLimit / 1024 / 1024)
+      used: memory.usedJSHeapSize / 1048576, // Convert to MB
+      total: memory.totalJSHeapSize / 1048576
     }
   }
+  
   return null
 }
 
-// Resource timing
-export function getResourceTiming() {
-  return performance.getEntriesByType('resource').map(entry => ({
+// Type for performance with memory
+interface PerformanceWithMemory extends Performance {
+  memory?: {
+    usedJSHeapSize: number
+    totalJSHeapSize: number
+    jsHeapSizeLimit: number
+  }
+}
+
+// Resource timing analysis
+export function analyzeResourceTiming(): ResourceTimingInfo[] {
+  const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[]
+  
+  return resources.map(entry => ({
     name: entry.name,
     duration: entry.duration,
-    size: (entry as any).transferSize || 0,
+    size: entry.transferSize || 0,
     type: entry.initiatorType
   }))
 }
 
+interface ResourceTimingInfo {
+  name: string
+  duration: number
+  size: number
+  type: string
+}
+
 // Bundle size estimation
 export function estimateBundleSize() {
-  const resources = getResourceTiming()
+  const resources = analyzeResourceTiming()
   const jsSize = resources
     .filter(r => r.name.includes('.js'))
     .reduce((total, r) => total + r.size, 0)
@@ -178,7 +195,7 @@ export class FPSMonitor {
       this.frameCount = 0
       this.lastTime = currentTime
       
-      performanceMonitor.addMetric('fps', this.fps)
+      addPerformanceMetric('fps', this.fps)
     }
 
     requestAnimationFrame(() => this.measureFPS())
@@ -194,31 +211,31 @@ export function createWorkerFromFunction(fn: (...args: unknown[]) => unknown) {
   return new Worker(URL.createObjectURL(blob))
 }
 
-// Debounce utility for performance
-export function debounce<T extends (...args: any[]) => any>(
+// Debounce utility with proper typing
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
-): T {
-  let timeout: ReturnType<typeof setTimeout> | null = null
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null
   
-  return ((...args: any[]) => {
+  return (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout)
     timeout = setTimeout(() => func(...args), wait)
-  }) as T
+  }
 }
 
-// Throttle utility for performance
-export function throttle<T extends (...args: any[]) => any>(
+// Throttle utility with proper typing
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
-): T {
-  let inThrottle: boolean
+): (...args: Parameters<T>) => void {
+  let inThrottle = false
   
-  return ((...args: any[]) => {
+  return (...args: Parameters<T>) => {
     if (!inThrottle) {
       func(...args)
       inThrottle = true
-      setTimeout(() => inThrottle = false, limit)
+      setTimeout(() => { inThrottle = false }, limit)
     }
-  }) as T
+  }
 }

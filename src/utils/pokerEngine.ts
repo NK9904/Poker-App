@@ -384,8 +384,12 @@ export class PokerEngine {
     const eval1 = this.evaluateHand(hand1, board)
     const eval2 = this.evaluateHand(hand2, board)
     
-    if (eval1.rank !== eval2.rank) {
-      return eval2.rank - eval1.rank // Lower rank number is better
+    // Convert HandRank enum to numeric values for comparison
+    const rankValue1 = this.getHandRankValue(eval1.rank)
+    const rankValue2 = this.getHandRankValue(eval2.rank)
+    
+    if (rankValue1 !== rankValue2) {
+      return rankValue2 - rankValue1 // Lower rank number is better
     }
     
     // Compare kickers if same rank
@@ -395,7 +399,26 @@ export class PokerEngine {
       }
     }
     
-    return 0 // Tie
+    return 0
+  }
+
+  /**
+   * Get numeric value for HandRank enum
+   */
+  private getHandRankValue(rank: HandRank): number {
+    const rankValues: Record<HandRank, number> = {
+      [HandRank.HIGH_CARD]: 0,
+      [HandRank.PAIR]: 1,
+      [HandRank.TWO_PAIR]: 2,
+      [HandRank.THREE_OF_A_KIND]: 3,
+      [HandRank.STRAIGHT]: 4,
+      [HandRank.FLUSH]: 5,
+      [HandRank.FULL_HOUSE]: 6,
+      [HandRank.FOUR_OF_A_KIND]: 7,
+      [HandRank.STRAIGHT_FLUSH]: 8,
+      [HandRank.ROYAL_FLUSH]: 9
+    }
+    return rankValues[rank] || 0
   }
 
   /**

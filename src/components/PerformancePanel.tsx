@@ -113,7 +113,7 @@ export const PerformancePanel = memo(() => {
           <div>
             <div style={{ fontWeight: '500', marginBottom: '0.25rem' }}>Memory Usage</div>
             <div style={{ color: 'var(--color-text-secondary)' }}>
-              {data.memory.used}MB / {data.memory.total}MB (Limit: {data.memory.limit}MB)
+              {data.memory.used.toFixed(1)}MB / {data.memory.total.toFixed(1)}MB
             </div>
             <div style={{
               width: '100%',

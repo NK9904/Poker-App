@@ -19,8 +19,11 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo)
+  componentDidCatch(_error: Error, _errorInfo: ErrorInfo) {
+    // Log error in production monitoring service
+    if (import.meta.env.PROD) {
+      // Send to error tracking service - error and errorInfo would be used here
+    }
     
     // Performance monitoring: Track errors
     if ('performance' in window && 'mark' in performance) {
@@ -34,7 +37,7 @@ export class ErrorBoundary extends Component<Props, State> {
         // Example: Send to analytics service
         // analytics.track('error', { error: error.message, stack: error.stack })
       } catch (reportError) {
-        console.error('Failed to report error:', reportError)
+        // Failed to report error, fail silently
       }
     }
   }
