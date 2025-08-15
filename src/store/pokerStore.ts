@@ -4,9 +4,12 @@ import type {
   Card, 
   HandRange, 
   AdvancedAnalysis, 
-  GameContext 
+  GameContext,
+  AnalysisResult,
+  ModelMetrics
 } from '../types/poker'
 import { pokerEngine, calculateHandStrength, getHandDescription } from '../utils/pokerEngine'
+import { DeepSeekPokerAI } from '../ai/DeepSeekPokerAI'
 
 interface PokerState {
   // Current hand
@@ -27,6 +30,11 @@ interface PokerState {
   // Game context for GTO calculations
   gameContext: GameContext
   
+  // AI model state
+  aiModel: DeepSeekPokerAI | null
+  modelMetrics: ModelMetrics | null
+  isAIAvailable: boolean
+  
   // Actions
   setPlayerCards: (cards: Card[] | ((prev: Card[]) => Card[])) => void
   setBoardCards: (cards: Card[] | ((prev: Card[]) => Card[])) => void
@@ -38,7 +46,13 @@ interface PokerState {
   
   // Advanced analysis actions
   runFullAnalysis: () => Promise<void>
+  runAIAnalysis: () => Promise<void>
   updateHandEvaluation: () => void
+  
+  // AI model actions
+  initializeAI: () => Promise<void>
+  getModelMetrics: () => ModelMetrics | null
+  clearAICache: () => void
 }
 
 const initialState = {
@@ -58,7 +72,10 @@ const initialState = {
     potSize: 100,
     stackSize: 1000,
     position: 'middle' as const
-  }
+  },
+  aiModel: null,
+  modelMetrics: null,
+  isAIAvailable: false
 }
 
 export const usePokerStore = create<PokerState>()(
@@ -144,6 +161,88 @@ export const usePokerStore = create<PokerState>()(
         console.error('Error running full analysis:', error)
       } finally {
         set({ isLoading: false })
+      }
+    },
+
+    runAIAnalysis: async () => {
+      const state = get()
+      if (state.playerCards.length === 0 || !state.aiModel) return
+      
+      set({ isLoading: true })
+      
+      try {
+        const aiAnalysis = await state.aiModel.analyzeSituation(
+          state.playerCards,
+          state.boardCards,
+          state.gameContext
+        )
+        
+        set({
+          analysis: {
+            ...state.analysis,
+            aiAnalysis,
+            lastUpdated: new Date()
+          },
+          lastCalculation: new Date()
+        })
+        
+        // Update model metrics
+        const metrics = state.aiModel.getModelMetrics()
+        set({
+          modelMetrics: {
+            ...metrics,
+            lastUpdated: new Date(),
+            accuracy: 0.85, // This would come from model validation
+            version: '2.0.0'
+          }
+        })
+        
+      } catch (error) {
+        console.error('Error running AI analysis:', error)
+      } finally {
+        set({ isLoading: false })
+      }
+    },
+
+    initializeAI: async () => {
+      try {
+        const config = {
+          apiKey: process.env.VITE_DEEPSEEK_API_KEY || '',
+          model: 'deepseek-chat',
+          maxTokens: 4000,
+          temperature: 0.1
+        }
+        
+        if (!config.apiKey) {
+          console.warn('DeepSeek API key not found, AI features will be disabled')
+          set({ isAIAvailable: false })
+          return
+        }
+        
+        const aiModel = new DeepSeekPokerAI(config)
+        set({ 
+          aiModel,
+          isAIAvailable: true
+        })
+        
+        console.log('AI model initialized successfully')
+        
+      } catch (error) {
+        console.error('Failed to initialize AI model:', error)
+        set({ isAIAvailable: false })
+      }
+    },
+
+    getModelMetrics: () => {
+      const state = get()
+      return state.modelMetrics
+    },
+
+    clearAICache: () => {
+      const state = get()
+      if (state.aiModel) {
+        state.aiModel.clearCache()
+        console.log('AI cache cleared')
       }
     }
   }))
