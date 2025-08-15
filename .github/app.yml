@@ -1,0 +1,17 @@
+name: AI Poker Solver
+description: Advanced AI-powered poker analysis tool with GTO strategies and machine learning
+url: https://github.com/your-username/poker-app
+hook_attributes:
+  url: https://your-domain.com/webhook
+  content_type: json
+public: true
+default_permissions:
+  issues: write
+  pull_requests: write
+  contents: read
+  metadata: read
+default_events:
+  - issues
+  - pull_request
+  - push
+  - release

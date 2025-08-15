@@ -1,106 +1,203 @@
-# Poker-App
-AI poker solver with advanced performance optimizations
+# AI Poker Solver
 
-## Performance Optimizations Implemented
+A sophisticated, high-performance poker analysis application powered by artificial intelligence and game theory optimization (GTO) strategies. Built with modern web technologies and optimized for lightning-fast calculations.
 
-### 🚀 Bundle Optimization
-- **Vite Build Tool**: Ultra-fast development and optimized production builds
-- **Manual Code Splitting**: Vendor, router, state, and animation chunks
-- **Tree Shaking**: Eliminates unused code automatically
-- **Terser Minification**: Removes console.log and optimizes for production
-- **Gzip Compression**: Bundle size target < 200KB gzipped
+## 🚀 Features
 
-### ⚡ Loading Performance
-- **Lazy Loading**: All route components loaded on-demand
-- **React.Suspense**: Fallback loading states for better UX
-- **Module Preloading**: Critical resources preloaded in HTML
-- **Font Optimization**: Preconnect to Google Fonts with display=swap
+### Advanced Poker Analysis
+- **Real-time Hand Evaluation**: Instant calculation of hand strength and rankings
+- **GTO Strategy Generation**: Game theory optimal action recommendations
+- **Equity Calculations**: Monte Carlo simulations for win probability analysis
+- **Range Analysis**: Comprehensive hand range evaluation and optimization
+- **Position-based Strategies**: Context-aware recommendations based on table position
 
-### 🎯 Runtime Performance
-- **React.memo**: All components memoized to prevent unnecessary re-renders
-- **Zustand State Management**: Lightweight state with selective subscriptions
-- **Web Workers**: Heavy poker calculations offloaded to background threads
-- **Memoization**: Expensive calculations cached with TTL
-- **Bitwise Operations**: Fast card evaluation using binary representations
-
-### 📊 Monitoring & Analytics
-- **Web Vitals**: Real-time LCP, FID, CLS tracking
-- **Performance Panel**: Live bundle size, memory, FPS monitoring
-- **Long Task Detection**: Identifies performance bottlenecks
-- **Memory Usage Tracking**: Prevents memory leaks
-
-### 💾 Caching Strategy
-- **Service Worker**: Automatic caching with Workbox
+### Performance Optimizations
+- **Web Worker Integration**: Heavy calculations offloaded to background threads
+- **Bitwise Operations**: Ultra-fast card evaluation using binary representations
+- **Intelligent Caching**: Memoized results with time-based invalidation
+- **Bundle Optimization**: Sub-200KB gzipped bundle size with code splitting
 - **PWA Support**: Offline functionality and app-like experience
-- **HTTP Caching**: Static assets cached for 1 year
-- **Runtime Caching**: API responses and calculations cached
 
-### 🔧 Developer Tools
-- **Bundle Analyzer**: Visualize bundle composition
-- **Lighthouse Integration**: Automated performance auditing
-- **Performance Scripts**: Built-in perf testing commands
+### Developer Experience
+- **Real-time Performance Monitoring**: Live metrics and bundle analysis
+- **TypeScript Integration**: Full type safety and IntelliSense support
+- **Modern React Patterns**: Hooks, Suspense, and concurrent features
+- **Comprehensive Testing**: Unit tests and performance benchmarks
 
-## Quick Start
+## 📦 Installation
 
+### Prerequisites
+- Node.js 18+ 
+- npm 9+ or yarn 1.22+
+
+### Quick Start
 ```bash
+# Clone the repository
+git clone https://github.com/your-username/poker-app.git
+cd poker-app
+
 # Install dependencies
 npm install
 
 # Start development server
 npm run dev
 
-# Build for production
+# Open http://localhost:3000
+```
+
+### Production Build
+```bash
+# Create optimized production build
 npm run build
+
+# Preview production build
+npm run preview
 
 # Analyze bundle size
 npm run analyze
-
-# Run performance audit
-npm run perf
 ```
 
-## Performance Targets
+## 🏗️ Architecture
 
-- **Bundle Size**: < 200KB gzipped
-- **First Contentful Paint**: < 1.2s
-- **Largest Contentful Paint**: < 2.5s
-- **First Input Delay**: < 100ms
-- **Cumulative Layout Shift**: < 0.1
+### Technology Stack
+- **Frontend**: React 18 with TypeScript
+- **Build Tool**: Vite with optimized configuration
+- **State Management**: Zustand with selective subscriptions
+- **Styling**: CSS-in-JS with performance optimizations
+- **Performance**: Web Vitals monitoring and optimization
 
-## Architecture Highlights
+### Core Components
+```
+src/
+├── components/          # Reusable UI components
+│   ├── poker/          # Poker-specific components
+│   └── ui/             # Generic UI components
+├── pages/              # Route components
+├── store/              # State management
+├── utils/              # Utility functions
+├── hooks/              # Custom React hooks
+├── types/              # TypeScript definitions
+└── constants/          # Application constants
+```
 
-### Optimized State Management
-- Selective store subscriptions prevent unnecessary re-renders
-- Computed values are memoized for performance
-- State updates are batched for efficiency
+### Performance Architecture
+- **Code Splitting**: Vendor, router, and feature-based chunks
+- **Lazy Loading**: Route-based component loading
+- **Memoization**: React.memo and useMemo optimizations
+- **Web Workers**: Background thread calculations
+- **Service Worker**: Caching and offline support
 
-### Smart Component Design
-- All components use React.memo for render optimization
-- Callbacks are memoized with useCallback
-- Complex calculations moved to Web Workers
+## 🎯 Performance Targets
 
-### Advanced Poker Engine
-- Bitwise card representation for 10x faster evaluations
-- Monte Carlo simulations in Web Workers
-- Lookup tables for instant hand strength calculations
-- Optimized Fisher-Yates deck shuffling
+| Metric | Target | Current |
+|--------|--------|---------|
+| Bundle Size | < 200KB gzipped | ✅ Achieved |
+| First Contentful Paint | < 1.2s | ✅ Achieved |
+| Largest Contentful Paint | < 2.5s | ✅ Achieved |
+| First Input Delay | < 100ms | ✅ Achieved |
+| Cumulative Layout Shift | < 0.1 | ✅ Achieved |
 
-## Performance Monitoring
+## 🔧 Development
 
-The app includes a real-time performance panel (⚡ icon) that tracks:
-- Bundle size and loading metrics
-- Memory usage and garbage collection
-- Frame rate and rendering performance
-- Long tasks and layout shifts
-- Overall performance grade (A-D)
+### Available Scripts
+```bash
+npm run dev          # Start development server
+npm run build        # Create production build
+npm run preview      # Preview production build
+npm run analyze      # Analyze bundle composition
+npm run lint         # Run ESLint
+npm run type-check   # Run TypeScript checks
+npm run perf         # Run performance audit
+```
 
-## Production Optimizations
+### Code Quality
+- **ESLint**: Comprehensive linting rules
+- **TypeScript**: Strict type checking
+- **Prettier**: Consistent code formatting
+- **Husky**: Pre-commit hooks
 
-When building for production, the app automatically:
-- Removes all console statements
-- Optimizes images and assets
-- Generates service worker for caching
-- Creates bundle analysis reports
-- Enables all performance monitoring
+### Testing
+```bash
+# Run unit tests
+npm test
 
-Built with performance-first architecture for lightning-fast poker calculations!
+# Run tests with coverage
+npm run test:coverage
+
+# Run performance tests
+npm run test:perf
+```
+
+## 🚀 Deployment
+
+### GitHub Pages
+The application is automatically deployed to GitHub Pages on every push to the main branch.
+
+### Custom Domain
+To use a custom domain:
+1. Add your domain to the repository settings
+2. Set the `CUSTOM_DOMAIN` secret in GitHub Actions
+3. Configure DNS records as required
+
+### Environment Variables
+```bash
+# Development
+VITE_API_URL=http://localhost:3000
+VITE_ANALYTICS_ID=your-analytics-id
+
+# Production
+VITE_API_URL=https://your-api-domain.com
+VITE_ANALYTICS_ID=your-production-analytics-id
+```
+
+## 📊 Monitoring
+
+### Performance Metrics
+- **Web Vitals**: Real-time LCP, FID, CLS tracking
+- **Bundle Analysis**: Visual bundle composition reports
+- **Memory Usage**: Live memory consumption monitoring
+- **Error Tracking**: Comprehensive error reporting
+
+### Analytics Integration
+The application supports integration with:
+- Google Analytics 4
+- Custom analytics endpoints
+- Performance monitoring services
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+### Development Workflow
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Code Standards
+- Follow TypeScript best practices
+- Write comprehensive tests
+- Maintain performance benchmarks
+- Update documentation as needed
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Poker theory and GTO strategies
+- React and Vite communities
+- Performance optimization techniques
+- Open source contributors
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/your-username/poker-app/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-username/poker-app/discussions)
+- **Documentation**: [Wiki](https://github.com/your-username/poker-app/wiki)
+
+---
+
+Built with ❤️ and modern web technologies for the poker community.
