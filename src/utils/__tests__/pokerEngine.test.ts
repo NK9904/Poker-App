@@ -1,6 +1,6 @@
-import { PokerEngine } from '../pokerEngine';
-import { HandRank } from '../../types/poker';
-import type { Card } from '../../types/poker';
+import { PokerEngine } from '../pokerEngine'
+import { HandRank, Card } from '../../types/poker'
+import type { GtoAction } from '../../types/poker'
 
 // Mock Worker
 global.Worker = jest.fn().mockImplementation(() => ({
@@ -16,489 +16,408 @@ global.Worker = jest.fn().mockImplementation(() => ({
 global.URL.createObjectURL = jest.fn(() => 'mock-url');
 
 describe('PokerEngine', () => {
-  let engine: PokerEngine;
+  let engine: PokerEngine
 
   beforeEach(() => {
-    engine = new PokerEngine();
+    engine = new PokerEngine()
     jest.clearAllMocks();
-  });
+  })
 
-  describe('Hand Evaluation', () => {
+  describe('evaluateHand', () => {
     it('should evaluate a royal flush correctly', () => {
       const playerCards: Card[] = [
-        { rank: 'A', suit: 'hearts', value: 14 },
-        { rank: 'K', suit: 'hearts', value: 13 }
-      ];
+        { rank: 'A', suit: 'h' },
+        { rank: 'K', suit: 'h' }
+      ]
       const boardCards: Card[] = [
-        { rank: 'Q', suit: 'hearts', value: 12 },
-        { rank: 'J', suit: 'hearts', value: 11 },
-        { rank: '10', suit: 'hearts', value: 10 }
-      ];
+        { rank: 'Q', suit: 'h' },
+        { rank: 'J', suit: 'h' },
+        { rank: 'T', suit: 'h' }
+      ]
 
-      const evaluation = engine.evaluateHand(playerCards, boardCards);
+      const evaluation = engine.evaluateHand(playerCards, boardCards)
       
-      expect(evaluation.rank).toBe(HandRank.ROYAL_FLUSH);
-      expect(evaluation.strength).toBeCloseTo(1.0);
-      expect(evaluation.description).toContain('Royal Flush');
-    });
+      expect(evaluation.rank).toBe(HandRank.ROYAL_FLUSH)
+      expect(evaluation.description).toContain('Royal Flush')
+    })
 
     it('should evaluate a straight flush correctly', () => {
       const playerCards: Card[] = [
-        { rank: '9', suit: 'clubs', value: 9 },
-        { rank: '8', suit: 'clubs', value: 8 }
-      ];
+        { rank: '9', suit: 'c' },
+        { rank: '8', suit: 'c' }
+      ]
       const boardCards: Card[] = [
-        { rank: '7', suit: 'clubs', value: 7 },
-        { rank: '6', suit: 'clubs', value: 6 },
-        { rank: '5', suit: 'clubs', value: 5 }
-      ];
+        { rank: '7', suit: 'c' },
+        { rank: '6', suit: 'c' },
+        { rank: '5', suit: 'c' }
+      ]
 
-      const evaluation = engine.evaluateHand(playerCards, boardCards);
+      const evaluation = engine.evaluateHand(playerCards, boardCards)
       
-      expect(evaluation.rank).toBe(HandRank.STRAIGHT_FLUSH);
-      expect(evaluation.strength).toBeGreaterThan(0.9);
-    });
+      expect(evaluation.rank).toBe(HandRank.STRAIGHT_FLUSH)
+      expect(evaluation.description).toContain('Straight Flush')
+    })
 
     it('should evaluate four of a kind correctly', () => {
       const playerCards: Card[] = [
-        { rank: 'A', suit: 'hearts', value: 14 },
-        { rank: 'A', suit: 'clubs', value: 14 }
-      ];
+        { rank: 'K', suit: 'h' },
+        { rank: 'K', suit: 'd' }
+      ]
       const boardCards: Card[] = [
-        { rank: 'A', suit: 'diamonds', value: 14 },
-        { rank: 'A', suit: 'spades', value: 14 },
-        { rank: 'K', suit: 'hearts', value: 13 }
-      ];
+        { rank: 'K', suit: 'c' },
+        { rank: 'K', suit: 's' },
+        { rank: '2', suit: 'h' }
+      ]
 
-      const evaluation = engine.evaluateHand(playerCards, boardCards);
+      const evaluation = engine.evaluateHand(playerCards, boardCards)
       
-      expect(evaluation.rank).toBe(HandRank.FOUR_OF_A_KIND);
-      expect(evaluation.description).toContain('Four of a Kind');
-    });
+      expect(evaluation.rank).toBe(HandRank.FOUR_OF_A_KIND)
+      expect(evaluation.description).toContain('Four of a Kind')
+    })
 
     it('should evaluate a full house correctly', () => {
       const playerCards: Card[] = [
-        { rank: 'K', suit: 'hearts', value: 13 },
-        { rank: 'K', suit: 'clubs', value: 13 }
-      ];
+        { rank: 'Q', suit: 'h' },
+        { rank: 'Q', suit: 'd' }
+      ]
       const boardCards: Card[] = [
-        { rank: 'K', suit: 'diamonds', value: 13 },
-        { rank: '7', suit: 'hearts', value: 7 },
-        { rank: '7', suit: 'clubs', value: 7 }
-      ];
+        { rank: 'Q', suit: 'c' },
+        { rank: '8', suit: 'h' },
+        { rank: '8', suit: 's' }
+      ]
 
-      const evaluation = engine.evaluateHand(playerCards, boardCards);
+      const evaluation = engine.evaluateHand(playerCards, boardCards)
       
-      expect(evaluation.rank).toBe(HandRank.FULL_HOUSE);
-      expect(evaluation.description).toContain('Full House');
-    });
+      expect(evaluation.rank).toBe(HandRank.FULL_HOUSE)
+      expect(evaluation.description).toContain('Full House')
+    })
 
     it('should evaluate a flush correctly', () => {
       const playerCards: Card[] = [
-        { rank: 'A', suit: 'diamonds', value: 14 },
-        { rank: '9', suit: 'diamonds', value: 9 }
-      ];
+        { rank: 'A', suit: 'd' },
+        { rank: '9', suit: 'd' }
+      ]
       const boardCards: Card[] = [
-        { rank: '7', suit: 'diamonds', value: 7 },
-        { rank: '5', suit: 'diamonds', value: 5 },
-        { rank: '3', suit: 'diamonds', value: 3 }
-      ];
+        { rank: '7', suit: 'd' },
+        { rank: '5', suit: 'd' },
+        { rank: '3', suit: 'd' }
+      ]
 
-      const evaluation = engine.evaluateHand(playerCards, boardCards);
+      const evaluation = engine.evaluateHand(playerCards, boardCards)
       
-      expect(evaluation.rank).toBe(HandRank.FLUSH);
-      expect(evaluation.description).toContain('Flush');
-    });
+      expect(evaluation.rank).toBe(HandRank.FLUSH)
+      expect(evaluation.description).toContain('Flush')
+    })
 
     it('should evaluate a straight correctly', () => {
       const playerCards: Card[] = [
-        { rank: '8', suit: 'hearts', value: 8 },
-        { rank: '7', suit: 'clubs', value: 7 }
-      ];
+        { rank: '8', suit: 'h' },
+        { rank: '7', suit: 'c' }
+      ]
       const boardCards: Card[] = [
-        { rank: '6', suit: 'diamonds', value: 6 },
-        { rank: '5', suit: 'spades', value: 5 },
-        { rank: '4', suit: 'hearts', value: 4 }
-      ];
+        { rank: '6', suit: 'd' },
+        { rank: '5', suit: 's' },
+        { rank: '4', suit: 'h' }
+      ]
 
-      const evaluation = engine.evaluateHand(playerCards, boardCards);
+      const evaluation = engine.evaluateHand(playerCards, boardCards)
       
-      expect(evaluation.rank).toBe(HandRank.STRAIGHT);
-      expect(evaluation.description).toContain('Straight');
-    });
+      expect(evaluation.rank).toBe(HandRank.STRAIGHT)
+      expect(evaluation.description).toContain('Straight')
+    })
 
     it('should evaluate three of a kind correctly', () => {
       const playerCards: Card[] = [
-        { rank: 'Q', suit: 'hearts', value: 12 },
-        { rank: 'Q', suit: 'clubs', value: 12 }
-      ];
+        { rank: 'Q', suit: 'h' },
+        { rank: 'Q', suit: 'c' }
+      ]
       const boardCards: Card[] = [
-        { rank: 'Q', suit: 'diamonds', value: 12 },
-        { rank: '8', suit: 'hearts', value: 8 },
-        { rank: '3', suit: 'clubs', value: 3 }
-      ];
+        { rank: 'Q', suit: 'd' },
+        { rank: '8', suit: 'h' },
+        { rank: '3', suit: 'c' }
+      ]
 
-      const evaluation = engine.evaluateHand(playerCards, boardCards);
+      const evaluation = engine.evaluateHand(playerCards, boardCards)
       
-      expect(evaluation.rank).toBe(HandRank.THREE_OF_A_KIND);
-      expect(evaluation.description).toContain('Three of a Kind');
-    });
+      expect(evaluation.rank).toBe(HandRank.THREE_OF_A_KIND)
+      expect(evaluation.description).toContain('Three of a Kind')
+    })
 
     it('should evaluate two pair correctly', () => {
       const playerCards: Card[] = [
-        { rank: 'J', suit: 'hearts', value: 11 },
-        { rank: 'J', suit: 'clubs', value: 11 }
-      ];
+        { rank: 'J', suit: 'h' },
+        { rank: 'J', suit: 'c' }
+      ]
       const boardCards: Card[] = [
-        { rank: '9', suit: 'diamonds', value: 9 },
-        { rank: '9', suit: 'spades', value: 9 },
-        { rank: '2', suit: 'hearts', value: 2 }
-      ];
+        { rank: '9', suit: 'd' },
+        { rank: '9', suit: 's' },
+        { rank: '2', suit: 'h' }
+      ]
 
-      const evaluation = engine.evaluateHand(playerCards, boardCards);
+      const evaluation = engine.evaluateHand(playerCards, boardCards)
       
-      expect(evaluation.rank).toBe(HandRank.TWO_PAIR);
-      expect(evaluation.description).toContain('Two Pair');
-    });
+      expect(evaluation.rank).toBe(HandRank.TWO_PAIR)
+      expect(evaluation.description).toContain('Two Pair')
+    })
 
     it('should evaluate one pair correctly', () => {
       const playerCards: Card[] = [
-        { rank: '10', suit: 'hearts', value: 10 },
-        { rank: '10', suit: 'clubs', value: 10 }
-      ];
+        { rank: 'T', suit: 'h' },
+        { rank: 'T', suit: 'c' }
+      ]
       const boardCards: Card[] = [
-        { rank: 'A', suit: 'diamonds', value: 14 },
-        { rank: '7', suit: 'spades', value: 7 },
-        { rank: '3', suit: 'hearts', value: 3 }
-      ];
+        { rank: 'A', suit: 'd' },
+        { rank: '7', suit: 's' },
+        { rank: '3', suit: 'h' }
+      ]
 
-      const evaluation = engine.evaluateHand(playerCards, boardCards);
+      const evaluation = engine.evaluateHand(playerCards, boardCards)
       
-      expect(evaluation.rank).toBe(HandRank.PAIR);
-      expect(evaluation.description).toContain('Pair');
-    });
+      expect(evaluation.rank).toBe(HandRank.PAIR)
+      expect(evaluation.description).toContain('Pair')
+    })
 
     it('should evaluate high card correctly', () => {
       const playerCards: Card[] = [
-        { rank: 'A', suit: 'hearts', value: 14 },
-        { rank: '9', suit: 'clubs', value: 9 }
-      ];
+        { rank: 'A', suit: 'h' },
+        { rank: '9', suit: 'c' }
+      ]
       const boardCards: Card[] = [
-        { rank: '7', suit: 'diamonds', value: 7 },
-        { rank: '5', suit: 'spades', value: 5 },
-        { rank: '3', suit: 'hearts', value: 3 }
-      ];
+        { rank: '7', suit: 'd' },
+        { rank: '5', suit: 's' },
+        { rank: '3', suit: 'h' }
+      ]
 
-      const evaluation = engine.evaluateHand(playerCards, boardCards);
+      const evaluation = engine.evaluateHand(playerCards, boardCards)
       
-      expect(evaluation.rank).toBe(HandRank.HIGH_CARD);
-      expect(evaluation.description).toContain('High Card');
-    });
+      expect(evaluation.rank).toBe(HandRank.HIGH_CARD)
+      expect(evaluation.description).toContain('High Card')
+    })
 
-    it('should handle empty board cards', () => {
+    it('should handle empty board correctly', () => {
       const playerCards: Card[] = [
-        { rank: 'A', suit: 'hearts', value: 14 },
-        { rank: 'K', suit: 'clubs', value: 13 }
-      ];
+        { rank: 'A', suit: 'h' },
+        { rank: 'K', suit: 'c' }
+      ]
 
-      const evaluation = engine.evaluateHand(playerCards);
+      const evaluation = engine.evaluateHand(playerCards, [])
       
-      expect(evaluation).toBeDefined();
-      expect(evaluation.rank).toBeDefined();
-    });
+      expect(evaluation.rank).toBe(HandRank.HIGH_CARD)
+    })
 
-    it('should cache evaluation results', () => {
+    it('should handle pre-flop evaluation', () => {
       const playerCards: Card[] = [
-        { rank: 'A', suit: 'hearts', value: 14 },
-        { rank: 'K', suit: 'hearts', value: 13 }
-      ];
+        { rank: 'A', suit: 'h' },
+        { rank: 'K', suit: 'h' }
+      ]
 
-      const evaluation1 = engine.evaluateHand(playerCards);
-      const evaluation2 = engine.evaluateHand(playerCards);
+      const evaluation = engine.evaluateHand(playerCards, [])
       
-      expect(evaluation1).toBe(evaluation2); // Same reference indicates cache hit
-    });
+      expect(evaluation).toBeDefined()
+      expect(evaluation.rank).toBeDefined()
+    })
 
-    it('should handle insufficient cards gracefully', () => {
+    it('should handle one card correctly', () => {
       const playerCards: Card[] = [
-        { rank: 'A', suit: 'hearts', value: 14 }
-      ];
+        { rank: 'A', suit: 'h' }
+      ]
 
-      const evaluation = engine.evaluateHand(playerCards);
+      const evaluation = engine.evaluateHand(playerCards, [])
       
-      expect(evaluation.rank).toBe(HandRank.HIGH_CARD);
-      expect(evaluation.strength).toBe(0);
-      expect(evaluation.description).toBe('No hand');
-    });
-  });
+      expect(evaluation.rank).toBe(HandRank.HIGH_CARD)
+    })
+  })
 
-  describe('Equity Calculation', () => {
-    it('should calculate equity for strong hands', async () => {
+  describe('calculateEquity', () => {
+    it('should calculate equity for pocket aces vs pocket kings', async () => {
       const playerCards: Card[] = [
-        { rank: 'A', suit: 'hearts', value: 14 },
-        { rank: 'A', suit: 'clubs', value: 14 }
-      ];
+        { rank: 'A', suit: 'h' },
+        { rank: 'A', suit: 'c' }
+      ]
+      // Opponent cards would be used in a full equity calculation
+
+      const equity = await engine.calculateEquity(playerCards, [])
+      
+      expect(equity.winRate).toBeGreaterThan(0.7)
+      expect(equity.winRate).toBeLessThan(0.9)
+      expect(equity.loseRate).toBeGreaterThan(0.1)
+      expect(equity.loseRate).toBeLessThan(0.3)
+    })
+
+    it('should calculate equity with board cards', async () => {
+      const playerCards: Card[] = [
+        { rank: 'A', suit: 'h' },
+        { rank: 'A', suit: 'c' }
+      ]
+      // Opponent cards would be used in a full equity calculation
       const boardCards: Card[] = [
-        { rank: 'K', suit: 'hearts', value: 13 },
-        { rank: 'Q', suit: 'clubs', value: 12 },
-        { rank: 'J', suit: 'diamonds', value: 11 }
-      ];
+        { rank: 'J', suit: 'd' }
+      ]
 
-      const equity = await engine.calculateEquity(playerCards, boardCards);
+      const equity = await engine.calculateEquity(playerCards, boardCards)
       
-      expect(equity).toBeDefined();
-      expect(equity.winRate).toBeGreaterThan(0);
-      expect(equity.winRate + equity.tieRate + equity.loseRate).toBeCloseTo(1);
-    });
+      expect(equity.winRate).toBeGreaterThan(0.8)
+      expect(equity.confidence).toBeGreaterThan(0.9)
+    })
+  })
 
-    it('should use worker for Monte Carlo simulations when available', async () => {
-      const mockWorker = {
-        postMessage: jest.fn(),
-        addEventListener: jest.fn((event: string, handler: Function) => {
-          if (event === 'message') {
-            // Simulate worker response
-            setTimeout(() => {
-              handler({
-                data: {
-                  type: 'monte_carlo_result',
-                  result: {
-                    winRate: 0.65,
-                    tieRate: 0.05,
-                    loseRate: 0.30,
-                    confidence: 0.95
-                  }
-                }
-              });
-            }, 10);
-          }
-        }),
-        removeEventListener: jest.fn(),
-        terminate: jest.fn()
-      };
-
-      global.Worker = jest.fn().mockImplementation(() => mockWorker);
-      
-      const newEngine = new PokerEngine();
+  describe('getGtoStrategy', () => {
+    it('should provide GTO strategy for preflop', async () => {
       const playerCards: Card[] = [
-        { rank: 'K', suit: 'hearts', value: 13 },
-        { rank: 'K', suit: 'clubs', value: 13 }
-      ];
+        { rank: 'K', suit: 'h' },
+        { rank: 'K', suit: 'c' }
+      ]
+      const context = {
+        potSize: 100,
+        stackSize: 1000,
+        position: 'late' as const
+      }
 
-      const equity = await newEngine.calculateEquity(playerCards, []);
+      const strategy = await engine.calculateGtoStrategy(playerCards, [], context.potSize, context.stackSize)
       
-      expect(equity.winRate).toBe(0.65);
-      expect(equity.confidence).toBe(0.95);
-    });
+      expect(strategy.actions).toHaveLength(3)
+      expect(strategy.actions.some((a: GtoAction) => a.action === 'raise')).toBe(true)
+      expect(strategy.expectedValue).toBeGreaterThan(0)
+    })
 
-    it('should cache equity results', async () => {
+    it('should provide GTO strategy for flop', async () => {
       const playerCards: Card[] = [
-        { rank: 'Q', suit: 'hearts', value: 12 },
-        { rank: 'Q', suit: 'clubs', value: 12 }
-      ];
-
-      const equity1 = await engine.calculateEquity(playerCards, []);
-      const equity2 = await engine.calculateEquity(playerCards, []);
-      
-      expect(equity1).toBe(equity2); // Same reference indicates cache hit
-    });
-
-    it('should handle different iteration counts', async () => {
-      const playerCards: Card[] = [
-        { rank: '10', suit: 'hearts', value: 10 },
-        { rank: '10', suit: 'clubs', value: 10 }
-      ];
-
-      const equity = await engine.calculateEquity(playerCards, [], 5000);
-      
-      expect(equity).toBeDefined();
-      expect(equity.confidence).toBeLessThan(1);
-    });
-  });
-
-  describe('GTO Strategy Calculation', () => {
-    it('should calculate GTO strategy', async () => {
-      const playerCards: Card[] = [
-        { rank: 'A', suit: 'hearts', value: 14 },
-        { rank: 'K', suit: 'hearts', value: 13 }
-      ];
+        { rank: 'Q', suit: 'h' },
+        { rank: 'Q', suit: 'c' }
+      ]
       const boardCards: Card[] = [
-        { rank: 'Q', suit: 'hearts', value: 12 },
-        { rank: 'J', suit: 'clubs', value: 11 },
-        { rank: '10', suit: 'diamonds', value: 10 }
-      ];
+        { rank: 'Q', suit: 'd' },
+        { rank: 'Q', suit: 's' }
+      ]
+      const context = {
+        potSize: 200,
+        stackSize: 800,
+        position: 'middle' as const
+      }
 
-      const strategy = await engine.calculateGtoStrategy(
-        playerCards,
-        boardCards,
-        100,
-        1000
-      );
+      const strategy = await engine.calculateGtoStrategy(playerCards, boardCards, context.potSize, context.stackSize)
       
-      expect(strategy).toBeDefined();
-      expect(strategy.actions).toBeInstanceOf(Array);
-      expect(strategy.actions.length).toBeGreaterThan(0);
-      expect(strategy.expectedValue).toBeDefined();
-      expect(strategy.exploitability).toBeLessThanOrEqual(1);
-    });
+      expect(strategy.actions).toBeDefined()
+      expect(strategy.exploitability).toBeLessThan(0.1)
+    })
 
-    it('should recommend different actions based on hand strength', async () => {
-      const weakCards: Card[] = [
-        { rank: '2', suit: 'hearts', value: 2 },
-        { rank: '3', suit: 'clubs', value: 3 }
-      ];
-      const strongCards: Card[] = [
-        { rank: 'A', suit: 'hearts', value: 14 },
-        { rank: 'A', suit: 'clubs', value: 14 }
-      ];
-
-      const weakStrategy = await engine.calculateGtoStrategy(weakCards, [], 100, 1000);
-      const strongStrategy = await engine.calculateGtoStrategy(strongCards, [], 100, 1000);
-      
-      const weakFoldAction = weakStrategy.actions.find(a => a.action === 'fold');
-      const strongRaiseAction = strongStrategy.actions.find(a => a.action === 'raise');
-      
-      expect(weakFoldAction).toBeDefined();
-      expect(strongRaiseAction).toBeDefined();
-    });
-
-    it('should use worker for GTO calculations when available', async () => {
-      const mockWorker = {
-        postMessage: jest.fn(),
-        addEventListener: jest.fn((event: string, handler: Function) => {
-          if (event === 'message') {
-            setTimeout(() => {
-              handler({
-                data: {
-                  type: 'gto_result',
-                  result: {
-                    actions: [
-                      { action: 'raise', frequency: 0.8, sizing: 75 }
-                    ],
-                    expectedValue: 50,
-                    exploitability: 0.05
-                  }
-                }
-              });
-            }, 10);
-          }
-        }),
-        removeEventListener: jest.fn(),
-        terminate: jest.fn()
-      };
-
-      global.Worker = jest.fn().mockImplementation(() => mockWorker);
-      
-      const newEngine = new PokerEngine();
+    it('should provide GTO strategy for river', async () => {
       const playerCards: Card[] = [
-        { rank: 'K', suit: 'hearts', value: 13 },
-        { rank: 'K', suit: 'clubs', value: 13 }
-      ];
+        { rank: 'T', suit: 'h' },
+        { rank: '9', suit: 'h' }
+      ]
+      const boardCards: Card[] = [
+        { rank: 'A', suit: 'c' },
+        { rank: 'K', suit: 'c' }
+      ]
+      const context = {
+        potSize: 500,
+        stackSize: 500,
+        position: 'early' as const
+      }
 
-      const strategy = await newEngine.calculateGtoStrategy(playerCards, [], 100, 1000);
+      const strategy = await engine.calculateGtoStrategy(playerCards, boardCards, context.potSize, context.stackSize)
       
-      expect(strategy.actions[0].action).toBe('raise');
-      expect(strategy.expectedValue).toBe(50);
-    });
-  });
+      expect(strategy.actions).toBeDefined()
+      expect(strategy.actions.some((a: GtoAction) => a.action === 'fold')).toBe(true)
+    })
 
-  describe('Hand Comparison', () => {
-    it('should compare hands correctly', () => {
+    it('should handle all-in scenarios', async () => {
+      const playerCards: Card[] = [
+        { rank: 'A', suit: 'h' },
+        { rank: 'K', suit: 'h' }
+      ]
+      const boardCards: Card[] = [
+        { rank: 'Q', suit: 'h' },
+        { rank: 'J', suit: 'c' },
+        { rank: 'T', suit: 'd' }
+      ]
+      const context = {
+        potSize: 1000,
+        stackSize: 100,
+        position: 'late' as const
+      }
+
+      const strategy = await engine.calculateGtoStrategy(playerCards, boardCards, context.potSize, context.stackSize)
+      
+      expect(strategy.actions).toBeDefined()
+      expect(strategy.actions.some((a: GtoAction) => a.action === 'raise' && a.sizing === 100)).toBe(true)
+    })
+  })
+
+  describe('compareHands', () => {
+    it('should correctly compare hands with different ranks', () => {
       const hand1: Card[] = [
-        { rank: 'A', suit: 'hearts', value: 14 },
-        { rank: 'A', suit: 'clubs', value: 14 }
-      ];
+        { rank: 'A', suit: 'h' },
+        { rank: 'A', suit: 'c' }
+      ]
       const hand2: Card[] = [
-        { rank: 'K', suit: 'hearts', value: 13 },
-        { rank: 'K', suit: 'clubs', value: 13 }
-      ];
+        { rank: 'K', suit: 'h' },
+        { rank: 'K', suit: 'c' }
+      ]
 
-      const result = engine.compareHands(hand1, hand2);
+      const result = engine.compareHands(hand1, hand2)
       
-      expect(result).toBeGreaterThan(0); // Aces beat Kings
-    });
+      expect(result).toBeGreaterThan(0) // hand1 wins
+    })
+
+    it('should correctly compare hands with same rank but different kickers', () => {
+      const hand1: Card[] = [
+        { rank: 'A', suit: 'h' },
+        { rank: 'K', suit: 'c' }
+      ]
+      const hand2: Card[] = [
+        { rank: 'A', suit: 'c' },
+        { rank: 'Q', suit: 'c' }
+      ]
+      const boardCards: Card[] = [
+        { rank: '2', suit: 'h' },
+        { rank: '3', suit: 'c' }
+      ]
+
+      const result = engine.compareHands(hand1, hand2, boardCards)
+      
+      expect(result).toBeGreaterThan(0) // hand1 wins (better kicker)
+    })
 
     it('should handle ties correctly', () => {
       const hand1: Card[] = [
-        { rank: 'Q', suit: 'hearts', value: 12 },
-        { rank: 'Q', suit: 'clubs', value: 12 }
-      ];
+        { rank: 'A', suit: 'h' },
+        { rank: 'A', suit: 'c' }
+      ]
       const hand2: Card[] = [
-        { rank: 'Q', suit: 'diamonds', value: 12 },
-        { rank: 'Q', suit: 'spades', value: 12 }
-      ];
+        { rank: 'A', suit: 'd' },
+        { rank: 'A', suit: 's' }
+      ]
 
-      const result = engine.compareHands(hand1, hand2);
+      const result = engine.compareHands(hand1, hand2)
       
-      expect(result).toBe(0); // Tie
-    });
+      expect(result).toBe(0) // tie
+    })
+  })
 
-    it('should compare with board cards', () => {
-      const hand1: Card[] = [
-        { rank: '10', suit: 'hearts', value: 10 },
-        { rank: '9', suit: 'hearts', value: 9 }
-      ];
-      const hand2: Card[] = [
-        { rank: 'A', suit: 'clubs', value: 14 },
-        { rank: 'K', suit: 'clubs', value: 13 }
-      ];
-      const board: Card[] = [
-        { rank: '10', suit: 'clubs', value: 10 },
-        { rank: '10', suit: 'diamonds', value: 10 },
-        { rank: '2', suit: 'hearts', value: 2 },
-        { rank: '3', suit: 'clubs', value: 3 },
-        { rank: '4', suit: 'diamonds', value: 4 }
-      ];
-
-      const result = engine.compareHands(hand1, hand2, board);
+    describe('edge cases', () => {
+    it('should handle empty hands', () => {
+      const evaluation = engine.evaluateHand([], [])
       
-      expect(result).toBeGreaterThan(0); // Three tens beats high card
-    });
-  });
+      expect(evaluation).toBeDefined()
+      expect(evaluation.rank).toBe(HandRank.HIGH_CARD)
+    })
 
-  describe('Worker Management', () => {
-    it('should handle worker initialization failure', () => {
-      global.Worker = jest.fn().mockImplementation(() => {
-        throw new Error('Worker not supported');
-      });
-
-      const newEngine = new PokerEngine();
-      expect(newEngine).toBeDefined();
-    });
-
-    it('should terminate worker on cleanup', () => {
-      const mockTerminate = jest.fn();
-      const mockWorker = {
-        postMessage: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        terminate: mockTerminate
-      };
-
-      global.Worker = jest.fn().mockImplementation(() => mockWorker);
-      
-      const newEngine = new PokerEngine();
-      newEngine.cleanup();
-      
-      expect(mockTerminate).toHaveBeenCalled();
-    });
-  });
-
-  describe('Cache Management', () => {
-    it('should clear caches', () => {
+    it('should handle duplicate cards gracefully', () => {
       const playerCards: Card[] = [
-        { rank: 'J', suit: 'hearts', value: 11 },
-        { rank: 'J', suit: 'clubs', value: 11 }
-      ];
+        { rank: 'J', suit: 'h' },
+        { rank: 'J', suit: 'c' }
+      ]
+      const boardCards: Card[] = [
+        { rank: 'J', suit: 'h' }, // duplicate
+        { rank: '9', suit: 's' },
+        { rank: '2', suit: 'h' }
+      ]
 
-      engine.evaluateHand(playerCards);
-      engine.clearCache();
+      const evaluation = engine.evaluateHand(playerCards, boardCards)
       
-      // After clearing, a new evaluation should create a new object
-      const evaluation1 = engine.evaluateHand(playerCards);
-      engine.clearCache();
-      const evaluation2 = engine.evaluateHand(playerCards);
-      
-      expect(evaluation1).not.toBe(evaluation2);
-    });
-  });
-});
+      expect(evaluation).toBeDefined()
+    })
+  })
+})

@@ -1,11 +1,11 @@
 import { useEffect, useState, useCallback } from 'react'
-import { performanceMonitor, getMemoryUsage, estimateBundleSize } from '../utils/performance'
+import { getMemoryUsage, estimateBundleSize, getPerformanceMetrics, addPerformanceMetric } from '../utils/performance'
+import type { PerformanceMetric } from '../types/performance'
 
 export interface PerformanceData {
   memory: {
     used: number
     total: number
-    limit: number
   } | null
   bundleSize: {
     js: number
@@ -29,11 +29,11 @@ export function usePerformance() {
   const updatePerformanceData = useCallback(() => {
     const memory = getMemoryUsage()
     const bundleSize = estimateBundleSize()
-    const metrics = performanceMonitor.getMetrics()
+    const metrics = getPerformanceMetrics()
     
-    const longTasks = metrics.filter(m => m.name === 'long-task').length
-    const layoutShifts = metrics.filter(m => m.name === 'layout-shift').length
-    const fpsMetrics = metrics.filter(m => m.name === 'fps')
+    const longTasks = metrics.filter((m: PerformanceMetric) => m.name === 'long-task').length
+    const layoutShifts = metrics.filter((m: PerformanceMetric) => m.name === 'layout-shift').length
+    const fpsMetrics = metrics.filter((m: PerformanceMetric) => m.name === 'fps')
     const fps = fpsMetrics.length > 0 ? fpsMetrics[fpsMetrics.length - 1].value : 0
 
     setData({
@@ -65,7 +65,7 @@ export function useRenderTime(componentName: string) {
     
     return () => {
       const duration = performance.now() - start
-      performanceMonitor.addMetric(`render-${componentName}`, duration)
+      addPerformanceMetric(`render-${componentName}`, duration)
     }
   })
 }
@@ -79,7 +79,7 @@ export function useAsyncMeasure() {
       return await fn()
     } finally {
       const duration = performance.now() - start
-      performanceMonitor.addMetric(name, duration)
+      addPerformanceMetric(name, duration)
     }
   }, [])
 }

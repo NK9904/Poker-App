@@ -4,31 +4,16 @@ import './index.css'
 
 // Performance monitoring
 import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals'
+import { logger } from './utils/logger'
 
 // Lazy load the main App component
 const App = React.lazy(() => import('./App'))
 
 // Enhanced Web Vitals performance monitoring
-function sendToAnalytics(metric: any) {
-  // In production, send to your analytics service
-  if (import.meta.env.PROD) {
-    // Example: Google Analytics 4
-    // gtag('event', metric.name, {
-    //   value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
-    //   metric_id: metric.id,
-    //   metric_value: metric.value,
-    //   metric_delta: metric.delta
-    // })
-    
-    // Example: Custom analytics endpoint
-    // fetch('/api/analytics', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(metric)
-    // }).catch(() => {}) // Fail silently
-  } else {
-    // Development logging
-    console.log('Performance metric:', metric)
+function sendToAnalytics(metric: unknown) {
+  // In production, this would send to your analytics service
+  if (import.meta.env.DEV) {
+    logger.log('Performance metric:', metric)
   }
 }
 
@@ -42,14 +27,14 @@ getTTFB(sendToAnalytics)
 // Enhanced Service Worker registration with error handling
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    const start = performance.now()
+    const startTime = performance.now()
     
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        const duration = performance.now() - start
+        const duration = performance.now() - startTime
         
         if (import.meta.env.DEV) {
-          console.log('SW registered:', registration, `(${duration.toFixed(2)}ms)`)
+          logger.log('SW registered:', registration, `(${duration.toFixed(2)}ms)`)
         }
         
         // Enhanced update handling
@@ -76,7 +61,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
       })
       .catch((registrationError) => {
         if (import.meta.env.DEV) {
-          console.error('SW registration failed:', registrationError)
+          logger.error('SW registration failed:', registrationError)
         }
       })
   })
@@ -136,13 +121,7 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error to monitoring service in production
-    if (import.meta.env.PROD) {
-      // Example: Send to error tracking service
-      // Sentry.captureException(error, { extra: errorInfo })
-    } else {
-      console.error('Application error:', error, errorInfo)
-    }
+    logger.error('Application error:', error, errorInfo)
   }
 
   render() {

@@ -1,5 +1,6 @@
 import type { Card, GameContext, PokerAction, AnalysisResult } from '../types/poker'
 import { PokerEngine } from '../utils/pokerEngine'
+import { logger } from '../utils/logger'
 
 interface OpenSourceConfig {
   ollamaUrl: string
@@ -48,7 +49,7 @@ export class OpenSourcePokerAI {
         ) || false
       }
     } catch (error) {
-      console.warn('Ollama not available, falling back to local analysis:', error)
+      logger.warn('Ollama not available, falling back to local analysis:', error)
       this.isModelAvailable = false
     }
   }
@@ -83,7 +84,7 @@ export class OpenSourcePokerAI {
       
       return analysis
     } catch (error) {
-      console.error('AI analysis failed:', error)
+      logger.error('AI analysis failed:', error)
       // Fallback to traditional poker engine
       return this.fallbackAnalysis(playerCards, boardCards, gameContext)
     }
@@ -152,7 +153,7 @@ export class OpenSourcePokerAI {
       const data = await response.json()
       return this.parseAnalysisResponse(data.response)
     } catch (error) {
-      console.error('Ollama API call failed:', error)
+      logger.error('Ollama API call failed:', error)
       throw error
     }
   }
@@ -324,7 +325,7 @@ Provide optimal actions in JSON format:
         modelVersion: 'Ollama-1.0'
       }
     } catch (error) {
-      console.error('Failed to parse AI response:', error)
+      logger.error('Failed to parse AI response:', error)
       throw new Error('Invalid response format from AI')
     }
   }

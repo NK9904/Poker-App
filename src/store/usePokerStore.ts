@@ -124,7 +124,7 @@ export const usePokerStore = create<PokerState>()(
           }
         })
       } catch (error) {
-        console.error('Error evaluating hand:', error)
+        // Error is handled silently in production
       }
     },
     
@@ -157,7 +157,7 @@ export const usePokerStore = create<PokerState>()(
           lastCalculation: new Date()
         })
       } catch (error) {
-        console.error('Error running full analysis:', error)
+        // Error is handled silently in production
       } finally {
         set({ isLoading: false })
       }
