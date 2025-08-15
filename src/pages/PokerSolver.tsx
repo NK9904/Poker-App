@@ -1,38 +1,57 @@
 import React, { memo, useCallback, useState, useMemo } from 'react'
-import { usePokerStore, usePlayerCards, useBoardCards, useHandStrength, useEquity } from '../store/usePokerStore'
+import { 
+  usePokerStore, 
+  usePlayerCards, 
+  useBoardCards, 
+  useHandStrength, 
+  useEquity,
+  useHandDescription,
+  useAnalysis,
+  useGtoStrategy,
+  useGameContext
+} from '../store/usePokerStore'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import type { GtoAction } from '../utils/pokerEngine'
 
 const PokerSolver = memo(() => {
   const [calculationTime, setCalculationTime] = useState<number>(0)
-  const { setPlayerCards, setBoardCards, setLoading, isLoading } = usePokerStore()
+  const { 
+    setPlayerCards, 
+    setBoardCards, 
+    setLoading, 
+    isLoading, 
+    runFullAnalysis,
+    setPotSize,
+    setStackSize,
+    setPosition
+  } = usePokerStore()
+  
   const playerCards = usePlayerCards()
   const boardCards = useBoardCards()
   const handStrength = useHandStrength()
   const equity = useEquity()
+  const handDescription = useHandDescription()
+  const analysis = useAnalysis()
+  const gtoStrategy = useGtoStrategy()
+  const gameContext = useGameContext()
 
-  // Memoized calculation function for performance
-  const runSolverCalculation = useCallback(async () => {
+  // Enhanced calculation function with AI modeling
+  const runAdvancedAnalysis = useCallback(async () => {
     const startTime = performance.now()
     setLoading(true)
 
     try {
-      // Simulate complex poker calculations
-      await new Promise(resolve => setTimeout(resolve, 50)) // Minimal delay for UX
-      
-      // In a real application, this would:
-      // 1. Use Web Workers for heavy calculations
-      // 2. Implement Monte Carlo simulations
-      // 3. Calculate GTO solutions
-      // 4. Use WebAssembly for performance-critical code
+      // Run comprehensive AI analysis
+      await runFullAnalysis()
       
       const endTime = performance.now()
       setCalculationTime(endTime - startTime)
     } finally {
       setLoading(false)
     }
-  }, [setLoading])
+  }, [runFullAnalysis, setLoading])
 
-  // Memoized card selection handlers with proper validation
+  // Enhanced card selection with better validation
   const handlePlayerCardSelect = useCallback((cardString: string) => {
     if (!cardString || cardString.length !== 2 || playerCards.length >= 2) return
     
@@ -79,6 +98,15 @@ const PokerSolver = memo(() => {
     ])
   }, [playerCards, boardCards, setBoardCards])
 
+  // Remove card handlers
+  const removePlayerCard = useCallback((index: number) => {
+    setPlayerCards(prev => prev.filter((_, i) => i !== index))
+  }, [setPlayerCards])
+
+  const removeBoardCard = useCallback((index: number) => {
+    setBoardCards(prev => prev.filter((_, i) => i !== index))
+  }, [setBoardCards])
+
   // Memoized card options for performance
   const cardOptions = useMemo(() => {
     const ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
@@ -87,14 +115,62 @@ const PokerSolver = memo(() => {
   }, [])
 
   return (
-    <div className="poker-solver" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+    <div className="poker-solver" style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>
-          Poker Solver
+          AI Poker Solver
         </h1>
         <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.125rem' }}>
-          Advanced GTO solver with performance-optimized calculations
+          Advanced GTO solver with machine learning-powered analysis
         </p>
+      </div>
+
+      {/* Game Context Controls */}
+      <div className="card" style={{ marginBottom: '2rem' }}>
+        <h3 style={{ marginBottom: '1rem', color: 'var(--color-accent)' }}>Game Context</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: '600' }}>
+              Pot Size
+            </label>
+            <input
+              type="number"
+              value={gameContext.potSize}
+              onChange={(e) => setPotSize(Number(e.target.value))}
+              className="btn"
+              style={{ width: '100%', textAlign: 'left' }}
+              min="1"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: '600' }}>
+              Stack Size
+            </label>
+            <input
+              type="number"
+              value={gameContext.stackSize}
+              onChange={(e) => setStackSize(Number(e.target.value))}
+              className="btn"
+              style={{ width: '100%', textAlign: 'left' }}
+              min="1"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: '600' }}>
+              Position
+            </label>
+            <select
+              value={gameContext.position}
+              onChange={(e) => setPosition(e.target.value as 'early' | 'middle' | 'late')}
+              className="btn"
+              style={{ width: '100%' }}
+            >
+              <option value="early">Early Position</option>
+              <option value="middle">Middle Position</option>
+              <option value="late">Late Position</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
@@ -105,7 +181,12 @@ const PokerSolver = memo(() => {
             {playerCards.length > 0 ? (
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 {playerCards.map((card, index) => (
-                  <CardDisplay key={index} card={card} />
+                  <CardDisplay 
+                    key={index} 
+                    card={card} 
+                    onRemove={() => removePlayerCard(index)}
+                    removable
+                  />
                 ))}
               </div>
             ) : (
@@ -140,7 +221,12 @@ const PokerSolver = memo(() => {
             {boardCards.length > 0 ? (
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 {boardCards.map((card, index) => (
-                  <CardDisplay key={index} card={card} />
+                  <CardDisplay 
+                    key={index} 
+                    card={card} 
+                    onRemove={() => removeBoardCard(index)}
+                    removable
+                  />
                 ))}
               </div>
             ) : (
@@ -169,20 +255,25 @@ const PokerSolver = memo(() => {
         </div>
       </div>
 
-      {/* Analysis Section */}
+      {/* Quick Analysis Section */}
       <div className="card" style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h3 style={{ color: 'var(--color-accent)' }}>Analysis</h3>
+          <h3 style={{ color: 'var(--color-accent)' }}>Quick Analysis</h3>
           <button 
-            onClick={runSolverCalculation}
+            onClick={runAdvancedAnalysis}
             disabled={isLoading || playerCards.length === 0}
             className="btn btn-primary"
           >
-            {isLoading ? <LoadingSpinner size="sm" /> : 'Calculate'}
+            {isLoading ? <LoadingSpinner size="sm" /> : 'Run AI Analysis'}
           </button>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+          <MetricDisplay
+            label="Hand"
+            value={handDescription}
+            color="var(--color-accent)"
+          />
           <MetricDisplay
             label="Hand Strength"
             value={`${(handStrength * 100).toFixed(1)}%`}
@@ -194,26 +285,76 @@ const PokerSolver = memo(() => {
             color="var(--color-success)"
           />
           <MetricDisplay
-            label="Calculation Time"
+            label="Analysis Time"
             value={`${calculationTime.toFixed(1)}ms`}
             color="var(--color-warning)"
           />
-          <MetricDisplay
-            label="Performance"
-            value={calculationTime < 100 ? "Excellent" : calculationTime < 500 ? "Good" : "Slow"}
-            color={calculationTime < 100 ? "var(--color-success)" : calculationTime < 500 ? "var(--color-warning)" : "var(--color-danger)"}
-          />
         </div>
       </div>
+
+      {/* Advanced Analysis Results */}
+      {analysis.handEvaluation && (
+        <div className="card" style={{ marginBottom: '2rem' }}>
+          <h3 style={{ marginBottom: '1.5rem', color: 'var(--color-accent)' }}>Detailed Analysis</h3>
+          
+          {analysis.equityResult && (
+            <div style={{ marginBottom: '2rem' }}>
+              <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>Equity Simulation</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
+                <MetricDisplay
+                  label="Win Rate"
+                  value={`${(analysis.equityResult.winRate * 100).toFixed(1)}%`}
+                  color="var(--color-success)"
+                />
+                <MetricDisplay
+                  label="Tie Rate"
+                  value={`${(analysis.equityResult.tieRate * 100).toFixed(1)}%`}
+                  color="var(--color-warning)"
+                />
+                <MetricDisplay
+                  label="Lose Rate"
+                  value={`${(analysis.equityResult.loseRate * 100).toFixed(1)}%`}
+                  color="var(--color-danger)"
+                />
+                <MetricDisplay
+                  label="Confidence"
+                  value={`${(analysis.equityResult.confidence * 100).toFixed(1)}%`}
+                  color="var(--color-accent)"
+                />
+              </div>
+            </div>
+          )}
+
+          {gtoStrategy && (
+            <div>
+              <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>GTO Strategy</h4>
+              <div style={{ marginBottom: '1rem' }}>
+                <MetricDisplay
+                  label="Expected Value"
+                  value={`${gtoStrategy.expectedValue.toFixed(2)}`}
+                  color="var(--color-accent)"
+                />
+              </div>
+              <div style={{ display: 'grid', gap: '0.5rem' }}>
+                {gtoStrategy.actions.map((action, index) => (
+                  <GtoActionDisplay key={index} action={action} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 })
 
 interface CardDisplayProps {
   card: { rank: string; suit: string }
+  onRemove?: () => void
+  removable?: boolean
 }
 
-const CardDisplay = memo<CardDisplayProps>(({ card }) => {
+const CardDisplay = memo<CardDisplayProps>(({ card, onRemove, removable = false }) => {
   const suitSymbols = {
     hearts: '♥️',
     diamonds: '♦️',
@@ -230,6 +371,7 @@ const CardDisplay = memo<CardDisplayProps>(({ card }) => {
 
   return (
     <div style={{
+      position: 'relative',
       backgroundColor: 'white',
       color: suitColors[card.suit as keyof typeof suitColors],
       padding: '0.5rem',
@@ -241,6 +383,29 @@ const CardDisplay = memo<CardDisplayProps>(({ card }) => {
       textAlign: 'center'
     }}>
       {card.rank}{suitSymbols[card.suit as keyof typeof suitSymbols]}
+      {removable && onRemove && (
+        <button
+          onClick={onRemove}
+          style={{
+            position: 'absolute',
+            top: '-8px',
+            right: '-8px',
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            backgroundColor: '#ef4444',
+            color: 'white',
+            border: 'none',
+            fontSize: '12px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          ×
+        </button>
+      )}
     </div>
   )
 })
@@ -262,8 +427,32 @@ const MetricDisplay = memo<MetricDisplayProps>(({ label, value, color }) => (
   </div>
 ))
 
+interface GtoActionDisplayProps {
+  action: GtoAction
+}
+
+const GtoActionDisplay = memo<GtoActionDisplayProps>(({ action }) => (
+  <div style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0.75rem',
+    backgroundColor: 'var(--color-bg-secondary)',
+    borderRadius: '0.5rem'
+  }}>
+    <span style={{ fontWeight: '600', textTransform: 'capitalize' }}>
+      {action.action}
+      {action.sizing && ` (${action.sizing})`}
+    </span>
+    <span style={{ color: 'var(--color-accent)' }}>
+      {(action.frequency * 100).toFixed(1)}%
+    </span>
+  </div>
+))
+
 CardDisplay.displayName = 'CardDisplay'
 MetricDisplay.displayName = 'MetricDisplay'
+GtoActionDisplay.displayName = 'GtoActionDisplay'
 PokerSolver.displayName = 'PokerSolver'
 
 export default PokerSolver
