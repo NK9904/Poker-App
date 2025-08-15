@@ -5,13 +5,13 @@
 /* Custom CSS variables and base styles */
 :root {
   --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  --color-bg-primary: #0f172a;
-  --color-bg-secondary: #1e293b;
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #cbd5e1;
-  --color-accent: #3b82f6;
-  --color-accent-hover: #2563eb;
-  --color-success: #10b981;
+  --color-bg-primary: #000000;
+  --color-bg-secondary: #1a0000;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e0e0e0;
+  --color-accent: #dc2626;
+  --color-accent-hover: #b91c1c;
+  --color-success: #16a34a;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
   --color-info: #06b6d4;
@@ -36,7 +36,7 @@
   }
 
   body {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(135deg, #000000 0%, #1a0000 100%);
     color: var(--color-text-primary);
     min-height: 100vh;
     font-display: swap;
@@ -64,31 +64,31 @@
 /* Component styles */
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-transparent cursor-pointer transition-all duration-200 ease-in-out text-decoration-none outline-none relative overflow-hidden;
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-transparent cursor-pointer transition-all duration-200 ease-in-out no-underline outline-none relative overflow-hidden;
   }
 
   .btn-primary {
-    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900;
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black;
   }
 
   .btn-secondary {
-    @apply bg-gray-700 text-gray-100 hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900;
+    @apply bg-gray-900 text-gray-100 hover:bg-gray-800 focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 focus:ring-offset-black;
   }
 
   .btn-success {
-    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900;
+    @apply bg-green-700 text-white hover:bg-green-800 focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:ring-offset-black;
   }
 
   .btn-warning {
-    @apply bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900;
+    @apply bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-black;
   }
 
   .btn-danger {
-    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900;
+    @apply bg-red-700 text-white hover:bg-red-800 focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-black;
   }
 
   .card {
-    @apply bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6 shadow-xl;
+    @apply bg-black/80 backdrop-blur-sm border border-red-900/50 rounded-xl p-6 shadow-xl;
   }
 
   .poker-card {
@@ -96,7 +96,7 @@
   }
 
   .poker-card.selected {
-    @apply border-blue-500 shadow-blue-500/25;
+    @apply border-red-600 shadow-red-600/25;
   }
 
   .poker-table {
@@ -104,15 +104,15 @@
   }
 
   .ai-assistant {
-    @apply fixed bottom-6 right-6 w-80 h-96 bg-gray-900/90 backdrop-blur-md border border-gray-700/50 rounded-2xl shadow-2xl z-50;
+    @apply fixed bottom-6 right-6 w-80 h-96 bg-black/90 backdrop-blur-md border border-red-900/50 rounded-2xl shadow-2xl z-50;
   }
 
   .loading-spinner {
-    @apply w-8 h-8 border-4 border-gray-600 border-t-blue-500 rounded-full animate-spin;
+    @apply w-8 h-8 border-4 border-gray-800 border-t-red-600 rounded-full animate-spin;
   }
 
   .metric-card {
-    @apply bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 shadow-lg;
+    @apply bg-gradient-to-br from-black/60 to-red-950/30 backdrop-blur-sm border border-red-900/50 rounded-xl p-4 shadow-lg;
   }
 
   .action-button {
@@ -139,7 +139,7 @@
 /* Utility styles */
 @layer utilities {
   .text-gradient {
-    @apply bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-red-500 to-red-800 bg-clip-text text-transparent;
   }
 
   .glass-effect {
@@ -147,7 +147,7 @@
   }
 
   .neon-glow {
-    @apply shadow-lg shadow-blue-500/25;
+    @apply shadow-lg shadow-red-600/25;
   }
 
   .animate-float {
@@ -166,8 +166,8 @@
 }
 
 @keyframes glow {
-  0% { box-shadow: 0 0 5px #3b82f6, 0 0 10px #3b82f6, 0 0 15px #3b82f6; }
-  100% { box-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6, 0 0 30px #3b82f6; }
+  0% { box-shadow: 0 0 5px #dc2626, 0 0 10px #dc2626, 0 0 15px #dc2626; }
+  100% { box-shadow: 0 0 10px #dc2626, 0 0 20px #dc2626, 0 0 30px #dc2626; }
 }
 
 @keyframes cardFlip {
