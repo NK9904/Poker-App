@@ -1,307 +1,481 @@
-# Contributing to AI Poker Solver
+# Contributing to Poker AI Solver
 
-Thank you for your interest in contributing to AI Poker Solver! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing to Poker AI Solver! This document provides comprehensive
+guidelines and information for contributors.
 
-## 🤝 How to Contribute
+## Table of Contents
 
-### Types of Contributions
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [Development Setup](#development-setup)
+- [Code Style & Standards](#code-style--standards)
+- [Testing Strategy](#testing-strategy)
+- [Pull Request Process](#pull-request-process)
+- [Bug Reports](#bug-reports)
+- [Feature Requests](#feature-requests)
+- [Architecture Guidelines](#architecture-guidelines)
+- [Performance Guidelines](#performance-guidelines)
+- [Security Guidelines](#security-guidelines)
 
-We welcome various types of contributions:
+## Code of Conduct
 
-- **Bug Reports**: Help us identify and fix issues
-- **Feature Requests**: Suggest new features or improvements
-- **Code Contributions**: Submit pull requests with code changes
-- **Documentation**: Improve or add documentation
-- **Testing**: Write or improve tests
-- **Performance**: Optimize code and improve performance
-- **Design**: Improve UI/UX and accessibility
+This project and everyone participating in it is governed by our
+[Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
 
-### Before You Start
+## Getting Started
 
-1. **Check Existing Issues**: Search existing issues to avoid duplicates
-2. **Read Documentation**: Familiarize yourself with the codebase
-3. **Set Up Development Environment**: Follow the installation guide
-4. **Join Discussions**: Participate in GitHub Discussions
+### Quick Start
 
-## 🛠️ Development Setup
+1. **Fork the repository** on GitHub
+2. **Clone your fork** locally
+3. **Create a feature branch** from `main`
+4. **Make your changes** following our guidelines
+5. **Test your changes** thoroughly
+6. **Submit a pull request** with a clear description
 
 ### Prerequisites
 
-- Node.js 18+
-- npm 9+ or yarn 1.22+
-- Git
+- **Node.js** 18+ (LTS recommended)
+- **npm** 9+ or **yarn** 1.22+
+- **Git** 2.30+
+- **Modern browser** for testing
 
-### Local Development
+## Development Setup
+
+### Initial Setup
 
 ```bash
-# Fork and clone the repository
-git clone https://github.com/your-username/poker-app.git
-cd poker-app
+# Clone your fork
+git clone https://github.com/your-username/poker-ai-solver.git
+cd poker-ai-solver
 
 # Install dependencies
 npm install
 
+# Set up Git hooks (optional but recommended)
+npm run prepare
+
 # Start development server
 npm run dev
-
-# Run tests
-npm test
-
-# Run linting
-npm run lint
 ```
 
-### Code Quality Tools
+### Environment Configuration
+
+Create a `.env.local` file in the root directory:
+
+```env
+# AI Configuration
+VITE_OLLAMA_URL=http://localhost:11434
+VITE_OLLAMA_MODEL=llama3.2:3b
+
+# Development Settings
+VITE_DEBUG_MODE=true
+VITE_ENABLE_ANALYTICS=false
+
+# API Configuration (if applicable)
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+### Available Scripts
 
 ```bash
-# Type checking
-npm run type-check
+# Development
+npm run dev              # Start development server
+npm run build            # Build for production
+npm run preview          # Preview production build
 
-# Linting
-npm run lint
+# Quality Assurance
+npm run lint             # Run ESLint
+npm run lint:fix         # Fix ESLint issues
+npm run format           # Format with Prettier
+npm run format:check     # Check Prettier formatting
+npm run type-check       # TypeScript type checking
+npm run quality          # Run all quality checks
 
-# Format code (if Prettier is configured)
-npm run format
+# Testing
+npm run test             # Run tests
+npm run test:watch       # Run tests in watch mode
+npm run test:coverage    # Run tests with coverage
+npm run test:ci          # Run tests for CI
 
-# Performance analysis
-npm run analyze
+# Performance
+npm run analyze          # Bundle analysis
+npm run lighthouse       # Lighthouse audit
+npm run perf             # Performance testing
 ```
 
-## 📝 Code Standards
+## Code Style & Standards
 
-### TypeScript
+### TypeScript Guidelines
 
-- Use strict TypeScript configuration
-- Provide proper type annotations
-- Avoid `any` types when possible
-- Use interfaces for object shapes
-- Export types from dedicated type files
+- **Use strict TypeScript**: All strict flags are enabled
+- **Prefer interfaces over types** for object shapes
+- **Use proper type annotations**: Avoid `any` when possible
+- **Leverage utility types**: Use `Partial<T>`, `Pick<T>`, `Omit<T>`, etc.
+- **Use const assertions**: `as const` for literal types
+- **Implement proper error handling**: Use `Result<T, E>` pattern where appropriate
 
-### React
+```typescript
+// ✅ Good
+interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  preferences: UserPreferences;
+}
 
-- Use functional components with hooks
-- Implement React.memo for performance
-- Use proper dependency arrays in useEffect
-- Follow React best practices
-- Use TypeScript for component props
+type UserPreferences = {
+  theme: 'light' | 'dark';
+  notifications: boolean;
+};
 
-### Performance
+// ❌ Avoid
+type User = any;
+```
 
-- Optimize bundle size
-- Use code splitting appropriately
-- Implement proper memoization
-- Monitor Web Vitals
-- Test performance impact
+### React Guidelines
 
-### Testing
+- **Use functional components** with hooks
+- **Implement proper prop types** with TypeScript
+- **Use React.memo** for expensive components
+- **Implement error boundaries** for error handling
+- **Follow React best practices** and hooks rules
 
-- Write unit tests for utilities
-- Test component behavior
-- Maintain good test coverage
-- Use meaningful test descriptions
-- Mock external dependencies
+```typescript
+// ✅ Good
+interface CardProps {
+  suit: Suit
+  rank: Rank
+  isSelected?: boolean
+  onSelect?: (card: Card) => void
+}
 
-## 🔄 Pull Request Process
+const Card: React.FC<CardProps> = React.memo(({
+  suit,
+  rank,
+  isSelected = false,
+  onSelect
+}) => {
+  const handleClick = useCallback(() => {
+    onSelect?.({ suit, rank })
+  }, [suit, rank, onSelect])
+
+  return (
+    <div
+      className={clsx('card', { 'selected': isSelected })}
+      onClick={handleClick}
+    >
+      {/* Card content */}
+    </div>
+  )
+})
+```
+
+### File Organization
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # Basic UI components
+│   ├── poker/          # Poker-specific components
+│   └── ai/             # AI-related components
+├── hooks/              # Custom React hooks
+├── utils/              # Utility functions
+├── types/              # TypeScript type definitions
+├── store/              # State management
+├── pages/              # Page components
+├── constants/          # Application constants
+└── ai/                 # AI logic and models
+```
+
+### Naming Conventions
+
+- **Files**: `PascalCase` for components, `camelCase` for utilities
+- **Components**: `PascalCase` (e.g., `PokerTable`, `AIAssistant`)
+- **Functions**: `camelCase` (e.g., `calculateEquity`, `evaluateHand`)
+- **Constants**: `UPPER_SNAKE_CASE` (e.g., `MAX_PLAYERS`, `DEFAULT_STACK`)
+- **Types/Interfaces**: `PascalCase` (e.g., `Card`, `GameState`)
+
+## Testing Strategy
+
+### Test Structure
+
+```typescript
+// Component test example
+import { render, screen, fireEvent } from '@testing-library/react'
+import { Card } from '@/components/poker/Card'
+
+describe('Card Component', () => {
+  const defaultProps = {
+    suit: 'hearts' as const,
+    rank: 'A' as const
+  }
+
+  it('renders card with correct suit and rank', () => {
+    render(<Card {...defaultProps} />)
+    expect(screen.getByText('A♠')).toBeInTheDocument()
+  })
+
+  it('calls onSelect when clicked', () => {
+    const onSelect = jest.fn()
+    render(<Card {...defaultProps} onSelect={onSelect} />)
+
+    fireEvent.click(screen.getByRole('button'))
+    expect(onSelect).toHaveBeenCalledWith({
+      suit: 'hearts',
+      rank: 'A'
+    })
+  })
+})
+```
+
+### Testing Guidelines
+
+- **Write tests for all new features**
+- **Maintain >80% test coverage**
+- **Test both success and error cases**
+- **Use descriptive test names**
+- **Mock external dependencies**
+- **Test accessibility features**
+
+### Test Categories
+
+1. **Unit Tests**: Individual functions and components
+2. **Integration Tests**: Component interactions
+3. **E2E Tests**: Full user workflows (if applicable)
+4. **Performance Tests**: Load testing and optimization
+
+## Pull Request Process
 
 ### Before Submitting
 
-1. **Create Feature Branch**: `git checkout -b feature/your-feature`
-2. **Make Changes**: Implement your feature or fix
-3. **Test Thoroughly**: Ensure all tests pass
-4. **Update Documentation**: Update relevant docs
-5. **Commit Changes**: Use conventional commit messages
+1. **Ensure all tests pass**:
 
-### Commit Message Format
+   ```bash
+   npm run test:ci
+   ```
 
-Use conventional commit messages:
+2. **Run quality checks**:
 
+   ```bash
+   npm run quality
+   ```
+
+3. **Update documentation** if needed
+
+4. **Check for security issues**:
+   ```bash
+   npm audit
+   ```
+
+### Pull Request Template
+
+```markdown
+## Description
+
+Brief description of changes
+
+## Type of Change
+
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Testing
+
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Manual testing completed
+
+## Checklist
+
+- [ ] Code follows style guidelines
+- [ ] Self-review completed
+- [ ] Documentation updated
+- [ ] No console errors
+- [ ] Performance impact considered
+
+## Screenshots (if applicable)
 ```
-type(scope): description
-
-[optional body]
-
-[optional footer]
-```
-
-Types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes
-- `refactor`: Code refactoring
-- `test`: Test changes
-- `chore`: Build/tool changes
-
-Examples:
-```
-feat(poker): add GTO strategy calculation
-fix(ui): resolve card display alignment issue
-docs(readme): update installation instructions
-```
-
-### Pull Request Guidelines
-
-1. **Clear Title**: Descriptive title for the PR
-2. **Detailed Description**: Explain what and why
-3. **Related Issues**: Link to relevant issues
-4. **Screenshots**: Include UI changes if applicable
-5. **Testing**: Describe how to test the changes
-6. **Breaking Changes**: Note any breaking changes
 
 ### Review Process
 
-1. **Automated Checks**: Ensure CI/CD passes
-2. **Code Review**: Address reviewer feedback
-3. **Testing**: Verify functionality
-4. **Documentation**: Update docs if needed
-5. **Merge**: Maintainer merges after approval
+1. **Automated checks** must pass
+2. **Code review** by maintainers
+3. **Testing** on different environments
+4. **Documentation** review
+5. **Final approval** from maintainers
 
-## 🐛 Bug Reports
+## Bug Reports
 
 ### Bug Report Template
 
 ```markdown
 ## Bug Description
-Brief description of the issue
+
+Clear description of the bug
 
 ## Steps to Reproduce
+
 1. Go to '...'
 2. Click on '...'
-3. See error
+3. Scroll down to '...'
+4. See error
 
 ## Expected Behavior
-What should happen
+
+What you expected to happen
 
 ## Actual Behavior
-What actually happens
+
+What actually happened
 
 ## Environment
-- OS: [e.g. Windows 10, macOS 12]
-- Browser: [e.g. Chrome 100, Firefox 95]
-- Node.js: [e.g. 18.0.0]
-- npm: [e.g. 9.0.0]
 
-## Additional Information
-Screenshots, console logs, etc.
+- OS: [e.g., Windows 11, macOS 14.0]
+- Browser: [e.g., Chrome 120, Firefox 121]
+- Node.js: [e.g., 18.17.0]
+- npm: [e.g., 9.6.7]
+
+## Additional Context
+
+- Error messages
+- Console logs
+- Screenshots
+- Performance impact
 ```
 
-## 💡 Feature Requests
+## Feature Requests
 
 ### Feature Request Template
 
 ```markdown
 ## Feature Description
-Brief description of the feature
+
+Clear description of the feature
 
 ## Problem Statement
-What problem does this solve?
+
+What problem does this feature solve?
 
 ## Proposed Solution
-How should this be implemented?
 
-## Alternatives Considered
-Other approaches you've considered
+How should this feature work?
 
-## Additional Context
-Any other relevant information
+## Alternative Solutions
+
+Other approaches considered
+
+## Implementation Ideas
+
+Technical implementation thoughts
+
+## Mockups/Wireframes
+
+Visual representations if applicable
+
+## Acceptance Criteria
+
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
 ```
 
-## 📚 Documentation
+## Architecture Guidelines
 
-### Documentation Standards
+### State Management
 
-- Use clear, concise language
-- Include code examples
-- Keep documentation up-to-date
-- Use proper markdown formatting
-- Include screenshots when helpful
+- **Use Zustand** for global state
+- **Keep state normalized** and flat
+- **Implement proper selectors** for derived state
+- **Use immer** for immutable updates
 
-### Documentation Areas
+### Performance Optimization
 
-- README.md: Project overview and setup
-- API Documentation: Component and function docs
-- Contributing Guidelines: This file
-- Code Comments: Inline documentation
-- Wiki: Extended documentation
+- **Implement code splitting** with React.lazy
+- **Use React.memo** for expensive components
+- **Optimize bundle size** with tree shaking
+- **Implement proper caching** strategies
 
-## 🧪 Testing
+### Error Handling
 
-### Testing Guidelines
+- **Use Error Boundaries** for component errors
+- **Implement proper logging** with structured data
+- **Provide user-friendly error messages**
+- **Handle network errors gracefully**
 
-- Write tests for new features
-- Ensure existing tests pass
-- Maintain good test coverage
-- Use meaningful test names
-- Test edge cases and error conditions
+## Performance Guidelines
 
-### Test Types
+### Bundle Optimization
 
-- **Unit Tests**: Test individual functions
-- **Component Tests**: Test React components
-- **Integration Tests**: Test component interactions
-- **Performance Tests**: Test performance metrics
-- **E2E Tests**: Test user workflows
+- **Code splitting** by routes and features
+- **Tree shaking** for unused code elimination
+- **Dynamic imports** for heavy dependencies
+- **Bundle analysis** to identify optimization opportunities
 
-## 🚀 Performance
+### Runtime Performance
 
-### Performance Guidelines
+- **Memoization** for expensive calculations
+- **Debouncing** for frequent events
+- **Virtualization** for large lists
+- **Lazy loading** for non-critical components
 
-- Monitor bundle size impact
-- Optimize render performance
-- Use appropriate caching strategies
-- Profile memory usage
-- Test on various devices
+## Security Guidelines
 
-### Performance Metrics
+### General Security
 
-- Bundle size (target: < 200KB gzipped)
-- First Contentful Paint (< 1.2s)
-- Largest Contentful Paint (< 2.5s)
-- First Input Delay (< 100ms)
-- Cumulative Layout Shift (< 0.1)
+- **Validate all inputs** on client and server
+- **Sanitize user data** before rendering
+- **Use HTTPS** in production
+- **Implement proper CORS** policies
 
-## 🤝 Community Guidelines
+### Frontend Security
 
-### Code of Conduct
+- **Avoid eval()** and similar functions
+- **Sanitize HTML** content
+- **Use Content Security Policy**
+- **Implement proper authentication** flows
 
-- Be respectful and inclusive
-- Use welcoming and inclusive language
-- Be collaborative and constructive
-- Focus on what is best for the community
-- Show empathy towards other community members
-
-### Communication
-
-- Use clear, professional language
-- Be patient with newcomers
-- Provide constructive feedback
-- Ask questions when unsure
-- Share knowledge and help others
-
-## 📞 Getting Help
+## Getting Help
 
 ### Resources
 
-- **Issues**: [GitHub Issues](https://github.com/your-username/poker-app/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/poker-app/discussions)
-- **Documentation**: [Wiki](https://github.com/your-username/poker-app/wiki)
-- **Code**: [Source Code](https://github.com/your-username/poker-app)
+- **Documentation**: Check the README and docs
+- **Issues**: Search existing issues and discussions
+- **Discussions**: Use GitHub Discussions for questions
+- **Community**: Join our community channels
 
-### Questions
+### Contact
 
-- Search existing issues and discussions
-- Check documentation and wiki
-- Ask in GitHub Discussions
-- Create an issue for bugs
-- Use feature requests for ideas
+- **Maintainers**: @maintainer1, @maintainer2
+- **Email**: support@poker-ai-solver.com
+- **Discord**: [Join our server](https://discord.gg/poker-ai)
 
-## 🙏 Recognition
+## Release Process
 
-Contributors will be recognized in:
+### Version Management
 
-- Repository contributors list
-- Release notes
-- Documentation acknowledgments
-- Community highlights
+We use [Semantic Versioning](https://semver.org/):
 
-Thank you for contributing to AI Poker Solver! 🎉
+- **MAJOR**: Breaking changes
+- **MINOR**: New features (backward compatible)
+- **PATCH**: Bug fixes (backward compatible)
+
+### Release Steps
+
+1. **Feature freeze** on release branch
+2. **Comprehensive testing** and bug fixes
+3. **Version bump** and changelog update
+4. **Release** and deployment
+5. **Announcement** to community
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the
+[MIT License](LICENSE).
+
+---
+
+Thank you for contributing to Poker AI Solver! Your contributions help make this project better for
+everyone.

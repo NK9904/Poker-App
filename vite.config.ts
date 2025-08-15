@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [
@@ -77,27 +78,43 @@ export default defineConfig({
       brotliSize: true
     })
   ],
-  build: {
-    target: 'esnext',
-    minify: 'terser',
-    cssMinify: true,
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.trace']
+  resolve: {
+    alias: {
+      '@': resolve(process.cwd(), 'src'),
+      '@/components': resolve(process.cwd(), 'src/components'),
+      '@/utils': resolve(process.cwd(), 'src/utils'),
+      '@/hooks': resolve(process.cwd(), 'src/hooks'),
+      '@/types': resolve(process.cwd(), 'src/types'),
+      '@/store': resolve(process.cwd(), 'src/store'),
+      '@/constants': resolve(process.cwd(), 'src/constants'),
+      '@/pages': resolve(process.cwd(), 'src/pages'),
+      '@/ai': resolve(process.cwd(), 'src/ai')
+    }
+  },
+      build: {
+      target: 'esnext',
+      minify: 'terser',
+      cssMinify: true,
+      reportCompressedSize: true,
+      chunkSizeWarningLimit: 1000,
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+          pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.trace'],
+          passes: 2
+        },
+        mangle: {
+          safari10: true
+        }
       },
-      mangle: {
-        safari10: true
-      }
-    },
-    rollupOptions: {
-      output: {
-        // Optimized chunk splitting for better caching
-        manualChunks: {
-          // Core React libraries
-          vendor: ['react', 'react-dom'],
-          // Router and navigation
+      rollupOptions: {
+        output: {
+          // Optimized chunk splitting for better caching
+          manualChunks: {
+            // Core React libraries
+            vendor: ['react', 'react-dom'],
+            // Router and navigation
           router: ['react-router-dom'],
           // State management
           state: ['zustand'],
