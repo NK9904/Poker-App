@@ -64,8 +64,8 @@ const HomePage = memo(() => {
     return () => clearInterval(interval)
   }, [])
 
-  const handleAction = (action: 'fold' | 'call' | 'raise', amount?: number) => {
-    console.log(`Player action: ${action}${amount ? ` $${amount}` : ''}`)
+  const handleAction = (_action: 'fold' | 'call' | 'raise', _amount?: number) => {
+    // Player action: ${action}${amount ? ` $${amount}` : ''}
     // Here you would integrate with your poker logic
   }
 

@@ -224,7 +224,7 @@ export const usePokerStore = create<PokerState>()(
           isAIAvailable: true
         })
         
-        console.log('AI model initialized successfully')
+        // AI model initialized successfully
         
       } catch (error) {
         console.error('Failed to initialize AI model:', error)
@@ -241,7 +241,7 @@ export const usePokerStore = create<PokerState>()(
       const state = get()
       if (state.aiModel) {
         state.aiModel.clearCache()
-        console.log('AI cache cleared')
+        // AI cache cleared
       }
     }
   }))

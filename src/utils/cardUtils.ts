@@ -26,7 +26,7 @@ export class CardUtils {
     
     const [rank, suit] = cardString.split('')
     
-    if (!CARD_RANKS.includes(rank as any) || !CARD_SUITS.includes(suit as any)) {
+    if (!CARD_RANKS.includes(rank as Card['rank']) || !CARD_SUITS.includes(suit as Card['suit'])) {
       return null
     }
     

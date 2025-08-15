@@ -27,14 +27,14 @@ class PerformanceMonitor {
         longTaskObserver.observe({ entryTypes: ['longtask'] })
         this.observers.push(longTaskObserver)
       } catch {
-        console.log('Long task observer not supported')
+        // Long task observer not supported
       }
 
       // Layout Shift Observer
       try {
         const clsObserver = new PerformanceObserver((list) => {
-          list.getEntries().forEach((entry: any) => {
-            if (!entry.hadRecentInput) {
+          list.getEntries().forEach((entry: PerformanceEntry & { hadRecentInput?: boolean; value?: number }) => {
+            if (!entry.hadRecentInput && entry.value !== undefined) {
               this.addMetric('layout-shift', entry.value)
             }
           })
@@ -42,7 +42,7 @@ class PerformanceMonitor {
         clsObserver.observe({ entryTypes: ['layout-shift'] })
         this.observers.push(clsObserver)
       } catch {
-        console.log('Layout shift observer not supported')
+        // Layout shift observer not supported
       }
     }
   }
@@ -85,7 +85,7 @@ export function measureAsync<T>(
   return fn().finally(() => {
     const duration = performance.now() - start
     performanceMonitor.addMetric(name, duration)
-    console.log(`${name}: ${duration.toFixed(2)}ms`)
+    // Performance metric: ${name}: ${duration.toFixed(2)}ms
   })
 }
 
@@ -100,14 +100,15 @@ export function measureSync<T>(
   } finally {
     const duration = performance.now() - start
     performanceMonitor.addMetric(name, duration)
-    console.log(`${name}: ${duration.toFixed(2)}ms`)
+    // Performance metric: ${name}: ${duration.toFixed(2)}ms
   }
 }
 
 // Memory utilities
 export function getMemoryUsage() {
   if ('memory' in performance) {
-    const memory = (performance as any).memory
+    const memory = (performance as Performance & { memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } }).memory
+    if (!memory) return null
     return {
       used: Math.round(memory.usedJSHeapSize / 1024 / 1024),
       total: Math.round(memory.totalJSHeapSize / 1024 / 1024),
@@ -122,7 +123,7 @@ export function getResourceTiming() {
   return performance.getEntriesByType('resource').map(entry => ({
     name: entry.name,
     duration: entry.duration,
-    size: (entry as any).transferSize || 0,
+    size: (entry as PerformanceResourceTiming).transferSize || 0,
     type: entry.initiatorType
   }))
 }
@@ -195,26 +196,26 @@ export function createWorkerFromFunction(fn: (...args: unknown[]) => unknown) {
 }
 
 // Debounce utility for performance
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): T {
   let timeout: ReturnType<typeof setTimeout> | null = null
   
-  return ((...args: any[]) => {
+  return ((...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout)
     timeout = setTimeout(() => func(...args), wait)
   }) as T
 }
 
 // Throttle utility for performance
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): T {
   let inThrottle: boolean
   
-  return ((...args: any[]) => {
+  return ((...args: Parameters<T>) => {
     if (!inThrottle) {
       func(...args)
       inThrottle = true

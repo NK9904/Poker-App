@@ -4,12 +4,13 @@ import './index.css'
 
 // Performance monitoring
 import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals'
+import { LoadingFallback } from './components/LoadingFallback'
 
 // Lazy load the main App component
 const App = React.lazy(() => import('./App'))
 
 // Enhanced Web Vitals performance monitoring
-function sendToAnalytics(metric: any) {
+function sendToAnalytics(_metric: { name: string; value: number; id: string; delta: number }) {
   // In production, send to your analytics service
   if (import.meta.env.PROD) {
     // Example: Google Analytics 4
@@ -28,7 +29,7 @@ function sendToAnalytics(metric: any) {
     // }).catch(() => {}) // Fail silently
   } else {
     // Development logging
-    console.log('Performance metric:', metric)
+    // Performance metric logged in development
   }
 }
 
@@ -42,14 +43,14 @@ getTTFB(sendToAnalytics)
 // Enhanced Service Worker registration with error handling
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    const start = performance.now()
+    // const start = performance.now()
     
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        const duration = performance.now() - start
+        // const duration = performance.now() - start
         
         if (import.meta.env.DEV) {
-          console.log('SW registered:', registration, `(${duration.toFixed(2)}ms)`)
+          // SW registered successfully
         }
         
         // Enhanced update handling
@@ -74,52 +75,15 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
           }
         })
       })
-      .catch((registrationError) => {
+      .catch((_registrationError) => {
         if (import.meta.env.DEV) {
-          console.error('SW registration failed:', registrationError)
+          // SW registration failed
         }
       })
   })
 }
 
-// Enhanced loading fallback with better styling
-const LoadingFallback = () => (
-  <div style={{
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh',
-    background: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
-    color: '#f9fafb',
-    fontFamily: 'system-ui, -apple-system, sans-serif'
-  }}>
-    <div 
-      className="loading" 
-      style={{
-        width: '40px',
-        height: '40px',
-        border: '3px solid #374151',
-        borderTop: '3px solid #60a5fa',
-        borderRadius: '50%',
-        animation: 'spin 1s linear infinite',
-        marginBottom: '1rem'
-      }}
-    />
-    <div style={{ fontSize: '1.125rem', fontWeight: '500' }}>
-      Loading AI Poker Solver...
-    </div>
-    <div style={{ 
-      fontSize: '0.875rem', 
-      color: '#9ca3af', 
-      marginTop: '0.5rem',
-      textAlign: 'center',
-      maxWidth: '300px'
-    }}>
-      Initializing advanced poker engine and AI models
-    </div>
-  </div>
-)
+
 
 // Error boundary for better error handling
 class ErrorBoundary extends React.Component<

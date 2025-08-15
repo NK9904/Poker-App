@@ -184,7 +184,7 @@ Respond in JSON format:
       const parsed = JSON.parse(response)
       
       return {
-        actions: parsed.actions.map((action: any) => ({
+        actions: parsed.actions.map((action: { action: string; frequency: number; sizing?: number; expectedValue: string; reasoning: string }) => ({
           action: action.action,
           frequency: action.frequency,
           sizing: action.sizing,
@@ -256,7 +256,7 @@ Respond in JSON format:
 
   private async fineTuneModel(): Promise<void> {
     // This would implement model fine-tuning with the collected data
-    console.log(`Fine-tuning model with ${this.trainingData.length} new training examples`)
+    // Fine-tuning model with ${this.trainingData.length} new training examples
     
     // In a real implementation, this would:
     // 1. Prepare the training data

@@ -175,7 +175,7 @@ export const PerformancePanel = memo(() => {
   )
 })
 
-function getPerformanceGrade(data: any): string {
+function getPerformanceGrade(data: { bundleSize: { total: number }; fps: number; memory?: { used: number; total: number; limit: number } | null; longTasks: number; layoutShifts: number }): string {
   let score = 0
   
   // Bundle size scoring (30 points)

@@ -2,7 +2,7 @@
  * Debounce utility for performance optimization
  * Delays execution of a function until after a specified delay has passed
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   delay: number
 ): (...args: Parameters<T>) => void {
@@ -25,7 +25,7 @@ export function debounce<T extends (...args: any[]) => any>(
  * Throttle utility for rate limiting function calls
  * Ensures a function is called at most once per specified interval
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
@@ -54,7 +54,7 @@ export function throttle<T extends (...args: any[]) => any>(
  * RAF (RequestAnimationFrame) throttle for smooth animations
  * Ensures function is called at most once per frame
  */
-export function rafThrottle<T extends (...args: any[]) => any>(
+export function rafThrottle<T extends (...args: unknown[]) => unknown>(
   func: T
 ): (...args: Parameters<T>) => void {
   let rafId: number | null = null
@@ -72,7 +72,7 @@ export function rafThrottle<T extends (...args: any[]) => any>(
 /**
  * Memoize utility for caching expensive function results
  */
-export function memoize<T extends (...args: any[]) => any>(
+export function memoize<T extends (...args: unknown[]) => unknown>(
   func: T,
   getKey?: (...args: Parameters<T>) => string
 ): T {
@@ -85,7 +85,7 @@ export function memoize<T extends (...args: any[]) => any>(
       return cache.get(key)!
     }
 
-    const result = func(...args)
+    const result = func(...args) as ReturnType<T>
     cache.set(key, result)
     return result
   }) as T
