@@ -99,6 +99,17 @@ export class OpenSourcePokerAI {
   ): Promise<PokerAction> {
     const analysis = await this.analyzeSituation(playerCards, boardCards, gameContext)
     
+    // Handle empty actions array
+    if (analysis.actions.length === 0) {
+      return {
+        action: 'check',
+        frequency: 1,
+        expectedValue: 0,
+        reasoning: 'No actions available',
+        confidence: 0.5
+      }
+    }
+    
     // Select action with highest expected value
     const bestAction = analysis.actions.reduce((best, current) => 
       (current.expectedValue || 0) > (best.expectedValue || 0) ? current : best
