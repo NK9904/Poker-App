@@ -4,17 +4,17 @@ export const RANK_VALUES: Record<string, number> = {
 }
 
 export const SUIT_SYMBOLS = {
-  hearts: '♥️',
-  diamonds: '♦️',
-  clubs: '♣️',
-  spades: '♠️'
+  h: '♥️',
+  d: '♦️',
+  c: '♣️',
+  s: '♠️'
 } as const
 
 export const SUIT_COLORS = {
-  hearts: '#ef4444',
-  diamonds: '#ef4444',
-  clubs: '#000000',
-  spades: '#000000'
+  h: '#ef4444',
+  d: '#ef4444',
+  c: '#000000',
+  s: '#000000'
 } as const
 
 export const CARD_RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'] as const

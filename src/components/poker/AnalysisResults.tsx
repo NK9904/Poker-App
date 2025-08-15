@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import type { AdvancedAnalysis } from '../../types/poker'
 import { useAIAnalysis, useAIConfidence, useAIStrategy, useAnalysisSource } from '../../store/selectors'
 
@@ -30,7 +30,7 @@ const AnalysisResults = memo(({ analysis, calculationTime }: AnalysisResultsProp
             color: 'var(--color-accent)'
           }}>
             <span style={{ fontSize: '1.5rem' }}>🤖</span>
-            <h3>DeepSeek AI Analysis</h3>
+            <h3>O3 AI Analysis</h3>
             <span style={{ 
               fontSize: '0.875rem', 
               color: 'var(--color-text-secondary)',
@@ -76,7 +76,7 @@ const AnalysisResults = memo(({ analysis, calculationTime }: AnalysisResultsProp
                       fontSize: '0.875rem',
                       color: 'var(--color-text-secondary)'
                     }}>
-                      {(action.frequency * 100).toFixed(1)}% frequency
+                      {((action.frequency || 0) * 100).toFixed(1)}% frequency
                     </span>
                   </div>
                   

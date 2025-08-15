@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import type { Card } from '../../types/poker'
 import { CardUtils } from '../../utils/cardUtils'
 
@@ -15,7 +15,7 @@ export const CardDisplay = memo<CardDisplayProps>(({
   removable = false,
   size = 'md'
 }) => {
-  const { symbol, color, display } = CardUtils.getCardDisplay(card)
+  const { color, display } = CardUtils.getCardDisplay(card)
   
   const sizeStyles = {
     sm: { padding: '0.25rem', fontSize: '0.875rem', minWidth: '32px' },

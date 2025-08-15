@@ -1,7 +1,8 @@
 import type { Card, GameContext, PokerAction, AnalysisResult } from '../types/poker'
 import { PokerEngine } from '../utils/pokerEngine'
+import OpenAI from 'openai'
 
-interface DeepSeekConfig {
+interface O3Config {
   apiKey: string
   model: string
   maxTokens: number
@@ -22,19 +23,23 @@ interface TrainingData {
   confidence: number
 }
 
-export class DeepSeekPokerAI {
-  private config: DeepSeekConfig
+export class O3PokerAI {
+  private config: O3Config
   private pokerEngine: PokerEngine
   private modelCache = new Map<string, AnalysisResult>()
   private trainingData: TrainingData[] = []
+  private openai: OpenAI
 
-  constructor(config: DeepSeekConfig) {
+  constructor(config: O3Config) {
     this.config = config
     this.pokerEngine = new PokerEngine()
+    this.openai = new OpenAI({
+      apiKey: config.apiKey
+    })
   }
 
   /**
-   * Analyze poker situation using DeepSeek AI
+   * Analyze poker situation using O3 AI
    */
   async analyzeSituation(
     playerCards: Card[],
@@ -48,11 +53,11 @@ export class DeepSeekPokerAI {
     }
 
     try {
-      // Prepare context for DeepSeek
+      // Prepare context for O3
       const prompt = this.buildAnalysisPrompt(playerCards, boardCards, gameContext)
       
-      // Call DeepSeek API
-      const response = await this.callDeepSeekAPI(prompt)
+      // Call O3 API
+      const response = await this.callO3API(prompt)
       
       // Parse and validate response
       const analysis = this.parseAnalysisResponse(response)
@@ -62,14 +67,14 @@ export class DeepSeekPokerAI {
       
       return analysis
     } catch (error) {
-      console.error('DeepSeek analysis failed:', error)
+      console.error('O3 analysis failed:', error)
       // Fallback to traditional poker engine
       return this.fallbackAnalysis(playerCards, boardCards, gameContext)
     }
   }
 
   /**
-   * Get optimal action recommendation from DeepSeek
+   * Get optimal action recommendation from O3
    */
   async getOptimalAction(
     playerCards: Card[],
@@ -80,7 +85,7 @@ export class DeepSeekPokerAI {
     
     // Select action with highest expected value
     const bestAction = analysis.actions.reduce((best, current) => 
-      current.expectedValue > best.expectedValue ? current : best
+      (current.expectedValue || 0) > (best.expectedValue || 0) ? current : best
     )
     
     return bestAction
@@ -145,21 +150,14 @@ Respond in JSON format:
 }`
   }
 
-  private async callDeepSeekAPI(prompt: string): Promise<string> {
-    // This would use the actual DeepSeek API
-    // For now, we'll simulate the API call
-    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.config.apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+  private async callO3API(prompt: string): Promise<string> {
+    try {
+      const completion = await this.openai.chat.completions.create({
         model: this.config.model,
         messages: [
           {
             role: 'system',
-            content: 'You are an expert poker AI trained on professional player data.'
+            content: 'You are an expert poker AI trained on professional player data. Always respond with valid JSON.'
           },
           {
             role: 'user',
@@ -169,14 +167,12 @@ Respond in JSON format:
         max_tokens: this.config.maxTokens,
         temperature: this.config.temperature
       })
-    })
 
-    if (!response.ok) {
-      throw new Error(`DeepSeek API error: ${response.status}`)
+      return completion.choices[0].message.content || ''
+    } catch (error) {
+      console.error('O3 API call failed:', error)
+      throw new Error(`O3 API error: ${error}`)
     }
-
-    const data = await response.json()
-    return data.choices[0].message.content
   }
 
   private parseAnalysisResponse(response: string): AnalysisResult {
@@ -196,8 +192,8 @@ Respond in JSON format:
         timestamp: new Date()
       }
     } catch (error) {
-      console.error('Failed to parse DeepSeek response:', error)
-      throw new Error('Invalid response format from DeepSeek')
+      console.error('Failed to parse O3 response:', error)
+      throw new Error('Invalid response format from O3')
     }
   }
 
@@ -260,7 +256,7 @@ Respond in JSON format:
     
     // In a real implementation, this would:
     // 1. Prepare the training data
-    // 2. Call DeepSeek's fine-tuning API
+    // 2. Call OpenAI's fine-tuning API
     // 3. Update the model configuration
     // 4. Validate the new model performance
   }
@@ -278,6 +274,7 @@ Respond in JSON format:
     cacheSize: number
     trainingDataSize: number
     averageConfidence: number
+    version: string
   } {
     const confidences = Array.from(this.modelCache.values()).map(r => r.confidence)
     const avgConfidence = confidences.length > 0 
@@ -287,7 +284,8 @@ Respond in JSON format:
     return {
       cacheSize: this.modelCache.size,
       trainingDataSize: this.trainingData.length,
-      averageConfidence: avgConfidence
+      averageConfidence: avgConfidence,
+      version: 'O3-1.0'
     }
   }
 

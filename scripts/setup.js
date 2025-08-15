@@ -35,7 +35,7 @@ class SetupWizard {
       console.log('\n🚀 Next steps:')
       console.log('1. Start the development server: npm run dev')
       console.log('2. Open http://localhost:5173 in your browser')
-      console.log('3. Configure your DeepSeek API key in .env')
+      console.log('3. Configure your OpenAI API key in .env')
       console.log('4. Run data scraping: npm run scrape-data')
       console.log('5. Train the model: npm run train-model')
 
@@ -144,7 +144,7 @@ class SetupWizard {
     // Create default model configuration
     const modelConfigPath = path.join(this.projectRoot, 'src/ai/modelConfig.json')
     const defaultConfig = {
-      modelId: 'deepseek-chat',
+      modelId: 'gpt-4o',
       lastUpdated: new Date().toISOString(),
       version: '1.0.0',
       trainingDataSize: 0,
@@ -158,7 +158,7 @@ class SetupWizard {
     // Create active model file
     const activeModelPath = path.join(this.projectRoot, 'src/ai/activeModel.json')
     const activeConfig = {
-      modelId: 'deepseek-chat',
+      modelId: 'gpt-4o',
       deployedAt: new Date().toISOString(),
       version: '1.0.0',
       status: 'active'
