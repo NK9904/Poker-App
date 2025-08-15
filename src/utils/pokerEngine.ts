@@ -1,49 +1,5 @@
-import type { Card } from '../store/usePokerStore'
-
-// Card rank values for evaluation
-const RANK_VALUES: Record<string, number> = {
-  '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'T': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14
-}
-
-// Hand rankings
-export enum HandRank {
-  HIGH_CARD = 1,
-  PAIR = 2,
-  TWO_PAIR = 3,
-  THREE_OF_A_KIND = 4,
-  STRAIGHT = 5,
-  FLUSH = 6,
-  FULL_HOUSE = 7,
-  FOUR_OF_A_KIND = 8,
-  STRAIGHT_FLUSH = 9,
-  ROYAL_FLUSH = 10
-}
-
-export interface HandEvaluation {
-  rank: HandRank
-  strength: number
-  description: string
-  kickers: number[]
-}
-
-export interface EquityResult {
-  winRate: number
-  tieRate: number
-  loseRate: number
-  confidence: number
-}
-
-export interface GtoAction {
-  action: 'fold' | 'call' | 'raise'
-  frequency: number
-  sizing?: number
-}
-
-export interface GtoStrategy {
-  actions: GtoAction[]
-  expectedValue: number
-  exploitability: number
-}
+import type { Card, HandRank, HandEvaluation, EquityResult, GtoAction, GtoStrategy } from '../types/poker'
+import { RANK_VALUES } from '../constants/poker'
 
 /**
  * Advanced Poker Engine with AI-powered calculations
