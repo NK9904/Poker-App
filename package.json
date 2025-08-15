@@ -29,6 +29,7 @@
     "rollup-plugin-visualizer": "^5.9.0",
     "typescript": "^5.0.2",
     "workbox-window": "^6.5.4",
+    "terser": "^5.22.0",
     "lighthouse": "^10.1.0"
   }
 }

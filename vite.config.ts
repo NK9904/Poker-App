@@ -18,10 +18,26 @@ export default defineConfig({
               cacheName: 'google-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+                maxAgeSeconds: 60 * 60 * 24 * 365
               },
-              cacheKeyWillBeUsed: async ({ request }) => {
-                return `${request.url}?v=1`
+              plugins: [
+                {
+                  cacheKeyWillBeUsed: async ({ request }: any) => `${request.url}?v=1`
+                }
+              ]
+            }
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-webfonts',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
               }
             }
           }

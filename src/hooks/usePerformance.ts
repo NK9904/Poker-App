@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { performanceMonitor, getMemoryUsage, estimateBundleSize } from '../utils/performance'
+import { performanceMonitor, getMemoryUsage, estimateBundleSize, FPSMonitor } from '../utils/performance'
 
 export interface PerformanceData {
   memory: {
@@ -46,13 +46,20 @@ export function usePerformance() {
   }, [])
 
   useEffect(() => {
+    // Start FPS monitoring
+    const fpsMonitor = new FPSMonitor()
+    fpsMonitor.start()
+
     // Update performance data initially
     updatePerformanceData()
 
     // Set up interval to update periodically
-    const interval = setInterval(updatePerformanceData, 5000)
+    const interval = window.setInterval(updatePerformanceData, 5000)
 
-    return () => clearInterval(interval)
+    return () => {
+      window.clearInterval(interval)
+      fpsMonitor.stop()
+    }
   }, [updatePerformanceData])
 
   return { data, refresh: updatePerformanceData }

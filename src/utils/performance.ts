@@ -16,7 +16,7 @@ class PerformanceMonitor {
 
   private setupObservers() {
     // Long Tasks Observer
-    if ('PerformanceObserver' in window) {
+    if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
       try {
         const longTaskObserver = new PerformanceObserver((list) => {
           list.getEntries().forEach((entry) => {
@@ -53,6 +53,9 @@ class PerformanceMonitor {
       value,
       timestamp: Date.now()
     })
+    if (this.metrics.length > 1000) {
+      this.metrics.splice(0, this.metrics.length - 1000)
+    }
   }
 
   getMetrics(name?: string): PerformanceMetric[] {
@@ -199,11 +202,11 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): T {
-  let timeout: NodeJS.Timeout | null = null
+  let timeout: number | null = null
   
   return ((...args: any[]) => {
-    if (timeout) clearTimeout(timeout)
-    timeout = setTimeout(() => func(...args), wait)
+    if (timeout !== null) window.clearTimeout(timeout)
+    timeout = window.setTimeout(() => func(...args), wait)
   }) as T
 }
 
@@ -212,13 +215,13 @@ export function throttle<T extends (...args: any[]) => any>(
   func: T,
   limit: number
 ): T {
-  let inThrottle: boolean
+  let inThrottle = false
   
   return ((...args: any[]) => {
     if (!inThrottle) {
       func(...args)
       inThrottle = true
-      setTimeout(() => inThrottle = false, limit)
+      window.setTimeout(() => { inThrottle = false }, limit)
     }
   }) as T
 }

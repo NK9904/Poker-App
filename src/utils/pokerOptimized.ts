@@ -122,17 +122,19 @@ export class FastPokerEvaluator {
       `
       
       const blob = new Blob([workerCode], { type: 'application/javascript' })
-      const worker = new Worker(URL.createObjectURL(blob))
+      const url = URL.createObjectURL(blob)
+      const worker = new Worker(url)
       
       worker.onmessage = (e) => {
         resolve(e.data)
         worker.terminate()
-        URL.revokeObjectURL(blob as any)
+        URL.revokeObjectURL(url)
       }
       
       worker.onerror = (error) => {
-        reject(error)
         worker.terminate()
+        URL.revokeObjectURL(url)
+        reject(error)
       }
       
       worker.postMessage({ playerCards, boardCards, opponentRange, iterations })
@@ -140,6 +142,7 @@ export class FastPokerEvaluator {
       // Timeout after 5 seconds
       setTimeout(() => {
         worker.terminate()
+        URL.revokeObjectURL(url)
         reject(new Error('Worker timeout'))
       }, 5000)
     })
